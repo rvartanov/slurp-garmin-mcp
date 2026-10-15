@@ -18,6 +18,7 @@ need.
 | `GARMIN_EMAIL`, `GARMIN_EMAIL_FILE` | | Login email. Only needed for `garmin-mcp-auth`, or as a fallback for accounts without MFA. |
 | `GARMIN_PASSWORD`, `GARMIN_PASSWORD_FILE` | | Password, same use as the email. |
 | `GARMIN_IS_CN` | `false` | `true` for Garmin Connect China (garmin.cn). |
+| `GARMIN_TZ` | server time zone | Your IANA time zone, e.g. `Europe/Amsterdam`. Write tools that take a date or local time (`add_body_composition`, `set_blood_pressure`) read it in this zone, and `get_device_last_used` reports times in it. Set it when the server runs in another zone than you (Docker, a remote host in UTC); otherwise a date-only weigh-in can land on the wrong day. |
 
 ## Transport
 
