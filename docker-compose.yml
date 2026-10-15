@@ -22,6 +22,7 @@ services:
       # Or, or additionally, a bearer token ("Authorization: Bearer <token>"):
       # GARMIN_MCP_HTTP_TOKEN_FILE: /run/secrets/http_token
       # GARMIN_IS_CN: "true"            # Garmin Connect China (garmin.cn)
+      # GARMIN_TZ: Europe/Amsterdam     # your time zone; the container runs in UTC
       # GARMIN_TOOL_PROFILE: ""         # see docs/configuration.md
     secrets:
       - url_secret
