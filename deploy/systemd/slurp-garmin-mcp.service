@@ -1,0 +1,49 @@
+# System unit for Slurp garmin-mcp. Installed by deploy/install.sh as
+# /etc/systemd/system/slurp-garmin-mcp.service.
+[Unit]
+Description=Slurp garmin-mcp (MCP server for Garmin Connect)
+Documentation=https://github.com/rvartanov/garmin-mcp
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=garmin-mcp
+Group=garmin-mcp
+# /var/lib/slurp-garmin-mcp: Garmin tokens and downloaded activity files.
+StateDirectory=slurp-garmin-mcp
+StateDirectoryMode=0700
+Environment=HOME=/var/lib/slurp-garmin-mcp
+Environment=GARMINTOKENS=/var/lib/slurp-garmin-mcp
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/etc/slurp-garmin-mcp/env
+ExecStart=/opt/slurp-garmin-mcp/venv/bin/garmin-mcp
+Restart=on-failure
+RestartSec=10
+
+# Hardening: the service only needs outbound HTTPS and its state directory.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ReadWritePaths=/var/lib/slurp-garmin-mcp
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+CapabilityBoundingSet=
+AmbientCapabilities=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

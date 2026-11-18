@@ -20,6 +20,7 @@ AuthSettings require an issuer URL), so the built app is wrapped instead.
 
 import hmac
 import ipaddress
+import logging
 import os
 
 from starlette.responses import JSONResponse
@@ -185,6 +186,25 @@ class UrlSecretGate:
         await self._app(forwarded, receive, send)
 
 
+class _RedactUrlSecret(logging.Filter):
+    """Keep the URL secret out of log lines (uvicorn's access log prints paths)."""
+
+    def __init__(self, secret: str):
+        super().__init__()
+        self._secret = secret
+
+    def _clean(self, value):
+        return value.replace(self._secret, "<secret>") if isinstance(value, str) else value
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        record.msg = self._clean(record.msg)
+        if isinstance(record.args, tuple):
+            record.args = tuple(self._clean(arg) for arg in record.args)
+        elif isinstance(record.args, dict):
+            record.args = {key: self._clean(arg) for key, arg in record.args.items()}
+        return True
+
+
 def _wrap_http_apps(fastmcp, wrap) -> None:
     for builder_name in ("streamable_http_app", "sse_app"):
         builder = getattr(fastmcp, builder_name)
@@ -207,6 +227,9 @@ def install_url_secret(fastmcp, secret: str) -> None:
     a 404 before the token is even looked at.
     """
     _wrap_http_apps(fastmcp, lambda app: UrlSecretGate(app, secret))
+    redact = _RedactUrlSecret(secret)
+    for logger_name in ("uvicorn.access", "uvicorn.error"):
+        logging.getLogger(logger_name).addFilter(redact)
 
 
 def exposure_warning(host: str, port: int) -> str:

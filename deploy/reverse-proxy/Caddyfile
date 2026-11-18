@@ -1,0 +1,20 @@
+# Caddy in front of Slurp garmin-mcp (TLS is automatic).
+# The server listens on 127.0.0.1:8000 with GARMIN_MCP_URL_SECRET and/or
+# GARMIN_MCP_HTTP_TOKEN set; Caddy only adds TLS and passes requests through.
+garmin.example.com {
+	# Keep the URL secret out of the access log.
+	log {
+		output file /var/log/caddy/garmin-mcp.log
+		format filter {
+			wrap json
+			fields {
+				request>uri delete
+			}
+		}
+	}
+
+	reverse_proxy 127.0.0.1:8000 {
+		# Streamable HTTP and SSE responses are streams: do not buffer them.
+		flush_interval -1
+	}
+}

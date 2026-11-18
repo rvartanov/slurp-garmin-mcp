@@ -1,0 +1,28 @@
+# User unit for Slurp garmin-mcp (no root needed). Install as
+#   ~/.config/systemd/user/slurp-garmin-mcp.service
+# then: systemctl --user daemon-reload && systemctl --user enable --now slurp-garmin-mcp
+# Run `loginctl enable-linger $USER` once so it keeps running after logout.
+#
+# Expects:
+#   ~/.local/share/slurp-garmin-mcp/venv   venv with the package installed
+#   ~/.config/slurp-garmin-mcp/env         see deploy/env.example
+#   ~/.local/state/slurp-garmin-mcp        Garmin tokens (from garmin-mcp-auth)
+[Unit]
+Description=Slurp garmin-mcp (MCP server for Garmin Connect)
+Documentation=https://github.com/rvartanov/garmin-mcp
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=GARMINTOKENS=%h/.local/state/slurp-garmin-mcp
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=%h/.config/slurp-garmin-mcp/env
+ExecStart=%h/.local/share/slurp-garmin-mcp/venv/bin/garmin-mcp
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=default.target

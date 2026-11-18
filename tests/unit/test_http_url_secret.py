@@ -251,3 +251,19 @@ def test_help_and_version_exit_before_starting(monkeypatch, capsys, flag, expect
 
     assert excinfo.value.code == 0
     assert expected in capsys.readouterr().out
+
+
+def test_access_log_does_not_contain_the_secret(http_env):
+    import logging
+
+    http_env.setenv("GARMIN_MCP_URL_SECRET", SECRET)
+    _run_main_and_build(http_env)
+    logger = logging.getLogger("uvicorn.access")
+    record = logger.makeRecord(
+        logger.name, logging.INFO, __file__, 0,
+        '%s - "%s %s HTTP/%s" %d',
+        ("127.0.0.1:1", "POST", f"/{SECRET}/mcp", "1.1", 200), None,
+    )
+
+    assert logger.filter(record)
+    assert record.getMessage() == '127.0.0.1:1 - "POST /<secret>/mcp HTTP/1.1" 200'
