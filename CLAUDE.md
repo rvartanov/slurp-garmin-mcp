@@ -1,8 +1,25 @@
-# Garmin MCP Server - Project Guide
+# Slurp garmin-mcp - Project Guide
 
 ## Overview
 
-This is a Model Context Protocol (MCP) server that connects to Garmin Connect and exposes fitness and health data to Claude and other MCP-compatible clients. The server provides 122 tools organized into 15 functional modules.
+Slurp garmin-mcp is a Model Context Protocol (MCP) server that connects to Garmin Connect and exposes fitness and health data to Claude and other MCP-compatible clients. The tools are organized into functional modules; the current list is generated into [docs/tools.md](docs/tools.md).
+
+It is a fork of [Taxuspt/garmin_mcp](https://github.com/Taxuspt/garmin_mcp) (remote `upstream`). Keep the Python module path `garmin_mcp` and avoid gratuitous reformatting of upstream files, so `git merge upstream/main` stays easy. Keep the MIT copyright notice of Alexandre Domingues in `LICENSE` and the origin in `NOTICE`.
+
+### Fork-specific parts
+
+- `src/garmin_mcp/http_auth.py`: bearer token, URL-secret mode (`GARMIN_MCP_URL_SECRET`), `_FILE` variants, `GARMIN_MCP_REQUIRE_AUTH`. Never print or log a secret.
+- `deploy/`: systemd units, `install.sh` / `uninstall.sh`, `env.example`, reverse proxy examples.
+- `Dockerfile`, `docker-compose.yml`: non-root HTTP service with required authentication.
+- `docs/`: user documentation. `docs/tools.md` is generated: run `uv run python scripts/generate_tools_doc.py` after adding, removing or re-describing a tool (CI checks it), and `uv run python scripts/generate_dxt_tools.py` for `dxt/manifest.json`.
+- `CHANGELOG.md`: add a line under "Unreleased" for every behaviour change.
+
+### Rules
+
+- No secrets, tokens, real account data or personal paths in the repository, fixtures or commit messages.
+- A new environment variable is documented in `docs/configuration.md` and `deploy/env.example`.
+- A tool that calls a Garmin endpoint directly (not through a python-garminconnect method) returns a clear error on an unexpected response; the pull request records the endpoint, payload and a sample response.
+- Every write tool is classified in `tool_annotations.py`.
 
 ## Critical: Garmin API Integration
 

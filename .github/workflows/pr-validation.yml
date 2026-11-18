@@ -55,7 +55,8 @@ jobs:
       run: |
         uv python install 3.13
         uv sync
-        uv run garmin-mcp --help || echo "CLI help command check"
+        uv run garmin-mcp --help
+        uv run garmin-mcp --version
 
   pr-info:
     runs-on: ubuntu-latest
