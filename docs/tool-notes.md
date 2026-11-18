@@ -68,4 +68,4 @@ Some endpoints are not implemented due to performance or complexity consideratio
   stderr. There is no undo.
 - Internal/Auth methods: `login()`, `resume_login()`, `connectapi()`, `download()` - Handled automatically by the library.
 
-If you need any of these endpoints, please [open an issue](https://github.com/rvartanov/garmin-mcp/issues).
+If you need any of these endpoints, please [open an issue](https://github.com/rvartanov/slurp-garmin-mcp/issues).

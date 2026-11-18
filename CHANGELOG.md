@@ -57,5 +57,5 @@ its history is preserved in this repository.
   `scripts/build_dxt.sh`.
 - Upstream maintainer tooling (`.claude/skills/babysit-prs`).
 
-[Unreleased]: https://github.com/rvartanov/garmin-mcp/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/rvartanov/garmin-mcp/releases/tag/v1.0.0
+[Unreleased]: https://github.com/rvartanov/slurp-garmin-mcp/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/rvartanov/slurp-garmin-mcp/releases/tag/v1.0.0

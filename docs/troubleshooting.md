@@ -40,7 +40,7 @@ which uvx
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/rvartanov/garmin-mcp",
+        "git+https://github.com/rvartanov/slurp-garmin-mcp",
         "garmin-mcp"
       ]
     }
@@ -142,7 +142,7 @@ chmod 600 ~/.garmin_email ~/.garmin_password
 
 # Run the authentication CLI before starting the server
 GARMIN_EMAIL_FILE=~/.garmin_email GARMIN_PASSWORD_FILE=~/.garmin_password \
-  uvx --python 3.12 --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp-auth
+  uvx --python 3.12 --from git+https://github.com/rvartanov/slurp-garmin-mcp garmin-mcp-auth
 
 # Enter MFA code when prompted
 # Tokens will be saved automatically
@@ -160,7 +160,7 @@ After initial authentication, configure Claude Desktop **without** credentials (
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/rvartanov/garmin-mcp",
+        "git+https://github.com/rvartanov/slurp-garmin-mcp",
         "garmin-mcp"
       ]
     }

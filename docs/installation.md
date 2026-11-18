@@ -17,21 +17,21 @@ Pick one. All install from GitHub; replace `main` with a tag to pin a version.
 
 ```bash
 # uv: installs the commands into ~/.local/bin
-uv tool install git+https://github.com/rvartanov/garmin-mcp@main
+uv tool install git+https://github.com/rvartanov/slurp-garmin-mcp@main
 
 # pip, into a virtualenv
 python3 -m venv ~/.venvs/garmin-mcp
-~/.venvs/garmin-mcp/bin/pip install git+https://github.com/rvartanov/garmin-mcp@main
+~/.venvs/garmin-mcp/bin/pip install git+https://github.com/rvartanov/slurp-garmin-mcp@main
 
 # uvx: no install, runs straight from GitHub (used in most client configs)
-uvx --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp --version
+uvx --from git+https://github.com/rvartanov/slurp-garmin-mcp garmin-mcp --version
 ```
 
 From a clone:
 
 ```bash
-git clone https://github.com/rvartanov/garmin-mcp
-cd garmin-mcp
+git clone https://github.com/rvartanov/slurp-garmin-mcp
+cd slurp-garmin-mcp
 uv sync            # development environment, then: uv run garmin-mcp
 pip install .      # or a regular install
 ```
@@ -105,14 +105,14 @@ is equivalent.
   "mcpServers": {
     "garmin-alice": {
       "command": "uvx",
-      "args": ["--python", "3.12", "--from", "git+https://github.com/rvartanov/garmin-mcp", "garmin-mcp"],
+      "args": ["--python", "3.12", "--from", "git+https://github.com/rvartanov/slurp-garmin-mcp", "garmin-mcp"],
       "env": {
         "GARMINTOKENS": "${HOME}/.garminconnect-alice"
       }
     },
     "garmin-bob": {
       "command": "uvx",
-      "args": ["--python", "3.12", "--from", "git+https://github.com/rvartanov/garmin-mcp", "garmin-mcp"],
+      "args": ["--python", "3.12", "--from", "git+https://github.com/rvartanov/slurp-garmin-mcp", "garmin-mcp"],
       "env": {
         "GARMINTOKENS": "${HOME}/.garminconnect-bob"
       }
@@ -174,7 +174,7 @@ For Claude Desktop, add `GARMIN_IS_CN` to the `env` section:
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/rvartanov/garmin-mcp",
+        "git+https://github.com/rvartanov/slurp-garmin-mcp",
         "garmin-mcp"
       ],
       "env": {

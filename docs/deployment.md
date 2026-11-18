@@ -18,8 +18,8 @@ Pick [systemd](#systemd) or [Docker](#docker) for steps 1 and 2, then
 Needs root, Python 3.10 or newer with the `venv` module, and git.
 
 ```bash
-git clone https://github.com/rvartanov/garmin-mcp
-sudo garmin-mcp/deploy/install.sh
+git clone https://github.com/rvartanov/slurp-garmin-mcp
+sudo slurp-garmin-mcp/deploy/install.sh
 ```
 
 The installer is safe to run again; that is also how you upgrade. It:
@@ -65,7 +65,7 @@ kept; add `--purge` to delete those and the user as well.
 
 ```bash
 python3 -m venv ~/.local/share/slurp-garmin-mcp/venv
-~/.local/share/slurp-garmin-mcp/venv/bin/pip install git+https://github.com/rvartanov/garmin-mcp@main
+~/.local/share/slurp-garmin-mcp/venv/bin/pip install git+https://github.com/rvartanov/slurp-garmin-mcp@main
 
 mkdir -p ~/.config/slurp-garmin-mcp ~/.local/state/slurp-garmin-mcp ~/.config/systemd/user
 chmod 700 ~/.config/slurp-garmin-mcp ~/.local/state/slurp-garmin-mcp

@@ -27,7 +27,7 @@ FROM python:3.12-slim
 
 LABEL org.opencontainers.image.title="Slurp garmin-mcp" \
       org.opencontainers.image.description="MCP server for Garmin Connect" \
-      org.opencontainers.image.source="https://github.com/rvartanov/garmin-mcp" \
+      org.opencontainers.image.source="https://github.com/rvartanov/slurp-garmin-mcp" \
       org.opencontainers.image.licenses="MIT"
 
 RUN groupadd --system --gid 10001 garmin-mcp \

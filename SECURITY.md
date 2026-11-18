@@ -4,7 +4,7 @@
 
 Please report security problems privately, not in a public issue:
 
-1. Go to <https://github.com/rvartanov/garmin-mcp/security/advisories/new>
+1. Go to <https://github.com/rvartanov/slurp-garmin-mcp/security/advisories/new>
    ("Report a vulnerability" on the repository's Security tab).
 2. Describe the problem, how to reproduce it and what an attacker gains.
 

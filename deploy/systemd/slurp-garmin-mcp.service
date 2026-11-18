@@ -2,7 +2,7 @@
 # /etc/systemd/system/slurp-garmin-mcp.service.
 [Unit]
 Description=Slurp garmin-mcp (MCP server for Garmin Connect)
-Documentation=https://github.com/rvartanov/garmin-mcp
+Documentation=https://github.com/rvartanov/slurp-garmin-mcp
 After=network-online.target
 Wants=network-online.target
 

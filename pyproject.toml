@@ -37,10 +37,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rvartanov/garmin-mcp"
-Repository = "https://github.com/rvartanov/garmin-mcp"
-Issues = "https://github.com/rvartanov/garmin-mcp/issues"
-Changelog = "https://github.com/rvartanov/garmin-mcp/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/rvartanov/slurp-garmin-mcp"
+Repository = "https://github.com/rvartanov/slurp-garmin-mcp"
+Issues = "https://github.com/rvartanov/slurp-garmin-mcp/issues"
+Changelog = "https://github.com/rvartanov/slurp-garmin-mcp/blob/main/CHANGELOG.md"
 
 [project.scripts]
 garmin-mcp = "garmin_mcp:main"

@@ -243,7 +243,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "uvx",
       "args": [
         "--python", "3.12",
-        "--from", "git+https://github.com/rvartanov/garmin-mcp",
+        "--from", "git+https://github.com/rvartanov/slurp-garmin-mcp",
         "garmin-mcp"
       ],
       "env": {

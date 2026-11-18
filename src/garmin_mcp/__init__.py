@@ -771,7 +771,7 @@ The most used ones:
   GARMIN_TOOL_PROFILE        built-in tool subset
   GARMIN_ENABLED_TOOLS / GARMIN_DISABLED_TOOLS   allow/deny lists
 
-Full reference: https://github.com/rvartanov/garmin-mcp/blob/main/docs/configuration.md
+Full reference: https://github.com/rvartanov/slurp-garmin-mcp/blob/main/docs/configuration.md
 """
 
 

@@ -8,7 +8,7 @@
 #   sudo SOURCE=. deploy/install.sh     # from a local checkout
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/rvartanov/garmin-mcp}"
+REPO_URL="${REPO_URL:-https://github.com/rvartanov/slurp-garmin-mcp}"
 REF="${REF:-main}"
 SOURCE="${SOURCE:-git+${REPO_URL}@${REF}}"
 PYTHON="${PYTHON:-python3}"

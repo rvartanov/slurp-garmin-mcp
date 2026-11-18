@@ -7,8 +7,8 @@ write it.
 ## Set up
 
 ```bash
-git clone https://github.com/rvartanov/garmin-mcp
-cd garmin-mcp
+git clone https://github.com/rvartanov/slurp-garmin-mcp
+cd slurp-garmin-mcp
 uv sync
 uv run pytest          # unit and integration tests, Garmin is mocked
 ```

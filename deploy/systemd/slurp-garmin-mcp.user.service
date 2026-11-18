@@ -9,7 +9,7 @@
 #   ~/.local/state/slurp-garmin-mcp        Garmin tokens (from garmin-mcp-auth)
 [Unit]
 Description=Slurp garmin-mcp (MCP server for Garmin Connect)
-Documentation=https://github.com/rvartanov/garmin-mcp
+Documentation=https://github.com/rvartanov/slurp-garmin-mcp
 After=network-online.target
 
 [Service]

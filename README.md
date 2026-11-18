@@ -19,10 +19,10 @@ Needs Python 3.10 or newer and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 # 1. Log in to Garmin once (asks for your MFA code if enabled)
-uvx --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp-auth
+uvx --from git+https://github.com/rvartanov/slurp-garmin-mcp garmin-mcp-auth
 
 # 2. Add the server to your client, for example Claude Code:
-claude mcp add garmin -- uvx --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp
+claude mcp add garmin -- uvx --from git+https://github.com/rvartanov/slurp-garmin-mcp garmin-mcp
 ```
 
 Claude Desktop, in `claude_desktop_config.json`:
@@ -32,7 +32,7 @@ Claude Desktop, in `claude_desktop_config.json`:
   "mcpServers": {
     "garmin": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/rvartanov/garmin-mcp", "garmin-mcp"]
+      "args": ["--from", "git+https://github.com/rvartanov/slurp-garmin-mcp", "garmin-mcp"]
     }
   }
 }
@@ -44,8 +44,8 @@ saved in step 1.
 ## Quick start (server)
 
 ```bash
-git clone https://github.com/rvartanov/garmin-mcp
-sudo garmin-mcp/deploy/install.sh     # systemd service, prints the next steps
+git clone https://github.com/rvartanov/slurp-garmin-mcp
+sudo slurp-garmin-mcp/deploy/install.sh     # systemd service, prints the next steps
 ```
 
 or with Docker:
