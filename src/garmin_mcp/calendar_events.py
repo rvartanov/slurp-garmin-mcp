@@ -119,6 +119,14 @@ def _clean_str(value: Any) -> Optional[str]:
     return trimmed or None
 
 
+def _event_id(item: Dict[str, Any]) -> Optional[int | str]:
+    """Garmin's id for the calendar event; needed to change or delete it."""
+    event_id = item.get("id")
+    if isinstance(event_id, (int, str)) and not isinstance(event_id, bool):
+        return event_id
+    return None
+
+
 def _curate_event(
     item: Dict[str, Any], detail: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
@@ -136,6 +144,7 @@ def _curate_event(
         "time_zone": event_time.get("timeZoneId"),
         "location": _clean_str(item.get("location")),
         "url": item.get("url"),
+        "event_id": _event_id(item),
         "event_uuid": item.get("shareableEventUuid"),
     }
 

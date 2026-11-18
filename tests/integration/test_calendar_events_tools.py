@@ -62,6 +62,7 @@ async def test_get_calendar_events_curates_fields(
             eventTimeLocal={"startTimeHhMm": "08:00", "timeZoneId": "Asia/Seoul"},
             primaryEvent=True,
             location="KR",
+            id=987654,
         )
     )
 
@@ -81,6 +82,7 @@ async def test_get_calendar_events_curates_fields(
     assert event["time_zone"] == "Asia/Seoul"
     assert event["location"] == "KR"
     assert event["event_uuid"] == "uuid-1"
+    assert event["event_id"] == 987654
 
 
 @pytest.mark.asyncio

@@ -6,6 +6,11 @@ All notable changes to Slurp garmin-mcp. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `get_calendar_events` returns `event_id`, Garmin's id for the calendar
+  event, in preparation for tools that change and delete events.
+
 ## [1.0.0] - 2026-11-18
 
 First release as Slurp garmin-mcp, forked from
