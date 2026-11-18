@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 from zipfile import ZipFile
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).parents[2]
 MANIFEST_PATH = REPO_ROOT / "dxt" / "manifest.json"
@@ -32,6 +34,9 @@ def test_user_config_defaults_do_not_contain_template_variables():
 
 
 def test_bundled_manifest_matches_source_manifest():
+    # The bundle is a build artifact (scripts/build_dxt.sh), not checked in.
+    if not BUNDLE_PATH.exists():
+        pytest.skip("garmin-mcp.dxt not built")
     manifest = _read_manifest()
     with ZipFile(BUNDLE_PATH) as bundle:
         assert bundle.namelist() == ["manifest.json"]

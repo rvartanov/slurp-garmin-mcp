@@ -63,7 +63,7 @@ def _first_line(description: str) -> str:
 
 async def _collect_tools() -> list[dict]:
     mock_client = MagicMock()
-    app = FastMCP("Garmin Connect v1.0")
+    app = FastMCP("Slurp garmin-mcp")
     for module in MODULES:
         module.configure(mock_client)
         module.register_tools(app)

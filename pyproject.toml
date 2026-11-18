@@ -3,11 +3,29 @@ requires = [ "hatchling",]
 build-backend = "hatchling.build"
 
 [project]
-name = "garmin-mcp"
-version = "0.1.0"
-description = "MCP server to access Garmin data"
+name = "slurp-garmin-mcp"
+version = "1.0.0"
+description = "Slurp garmin-mcp: MCP server for Garmin Connect, installable as a package and as a service"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+    { name = "Robert Vartanov" },
+    { name = "Alexandre Domingues" },
+]
+keywords = ["garmin", "garmin-connect", "mcp", "model-context-protocol", "fitness", "health"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "python-dotenv==1.2.2",
     "garminconnect==0.3.2",
@@ -18,15 +36,22 @@ dependencies = [
     "fitparse>=1.2.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/rvartanov/garmin-mcp"
+Repository = "https://github.com/rvartanov/garmin-mcp"
+Issues = "https://github.com/rvartanov/garmin-mcp/issues"
+Changelog = "https://github.com/rvartanov/garmin-mcp/blob/main/CHANGELOG.md"
+
 [project.scripts]
 garmin-mcp = "garmin_mcp:main"
+slurp-garmin-mcp = "garmin_mcp:main"
 garmin-mcp-auth = "garmin_mcp.auth_cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/garmin_mcp"]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=9.0.2",
     "pytest-asyncio>=0.25.2",
     "pytest-mock>=3.14.0",

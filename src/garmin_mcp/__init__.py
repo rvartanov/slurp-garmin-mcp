@@ -753,8 +753,50 @@ def init_api(email, password, tokenstore=None, tokenstore_base64=None, is_cn=Non
     return garmin
 
 
+_USAGE = """\
+Slurp garmin-mcp {version}: MCP server for Garmin Connect.
+
+Usage: garmin-mcp [--help] [--version]
+
+The server takes no arguments; it is configured through environment variables.
+The most used ones:
+
+  GARMINTOKENS               token directory (default ~/.garminconnect);
+                             create it once with `garmin-mcp-auth`
+  GARMIN_MCP_TRANSPORT       stdio (default) | streamable-http | sse
+  GARMIN_MCP_HOST / _PORT    HTTP bind address (default 127.0.0.1:8000)
+  GARMIN_MCP_HTTP_TOKEN      require 'Authorization: Bearer <token>' (or _FILE)
+  GARMIN_MCP_URL_SECRET      serve MCP under /<secret>/mcp only (or _FILE)
+  GARMIN_MCP_REQUIRE_AUTH    true: refuse to serve HTTP without a token/secret
+  GARMIN_TOOL_PROFILE        built-in tool subset
+  GARMIN_ENABLED_TOOLS / GARMIN_DISABLED_TOOLS   allow/deny lists
+
+Full reference: https://github.com/rvartanov/garmin-mcp/blob/main/docs/configuration.md
+"""
+
+
+def _package_version() -> str:
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("slurp-garmin-mcp")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+def _handle_cli_flags(argv: list[str]) -> None:
+    """Answer --help / --version and exit; anything else is left alone."""
+    if any(arg in ("-h", "--help") for arg in argv):
+        print(_USAGE.format(version=_package_version()))
+        sys.exit(0)
+    if any(arg in ("-V", "--version") for arg in argv):
+        print(f"slurp-garmin-mcp {_package_version()}")
+        sys.exit(0)
+
+
 def main():
     """Initialize the MCP server and register all tools"""
+    _handle_cli_flags(sys.argv[1:])
 
     # On Windows, stdout runs in text mode and translates \n to \r\n, which
     # breaks the MCP stdio framing that Claude Desktop and other clients expect.
@@ -818,7 +860,7 @@ def main():
     # Create the MCP app, wrapped so the env-var filter can drop tools.
     # host/port only matter for the HTTP transports; stdio ignores them.
     fastmcp = FastMCP(
-        "Garmin Connect v1.0",
+        "Slurp garmin-mcp",
         host=http_host,
         port=http_port,
         stateless_http=stateless_http,
@@ -896,7 +938,20 @@ def main():
         # is fine on loopback and dangerous anywhere else.
         from garmin_mcp import http_auth
 
-        http_token = http_auth.resolve_http_token()
+        try:
+            http_token = http_auth.resolve_http_token()
+            url_secret = http_auth.resolve_url_secret()
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            sys.exit(1)
+        if http_auth.require_auth() and not (http_token or url_secret):
+            print(
+                "GARMIN_MCP_REQUIRE_AUTH is set: refusing to serve HTTP without "
+                "GARMIN_MCP_HTTP_TOKEN or GARMIN_MCP_URL_SECRET (or their _FILE "
+                "variants).",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         if http_token:
             http_auth.install_http_bearer_auth(fastmcp, http_token)
             print(
@@ -904,7 +959,15 @@ def main():
                 "/healthz and /readyz stay open.",
                 file=sys.stderr,
             )
-        elif not http_auth.is_loopback(http_host):
+        if url_secret:
+            # Installed last so it is the outermost gate.
+            http_auth.install_url_secret(fastmcp, url_secret)
+            print(
+                "MCP endpoints are served under /<secret>/ only (GARMIN_MCP_URL_SECRET); "
+                "every other path is a 404, except /healthz and /readyz.",
+                file=sys.stderr,
+            )
+        if not (http_token or url_secret) and not http_auth.is_loopback(http_host):
             print(http_auth.exposure_warning(http_host, http_port), file=sys.stderr)
 
         mode = " (stateless)" if stateless_http and transport == "streamable-http" else ""

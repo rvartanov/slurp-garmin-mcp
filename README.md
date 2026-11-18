@@ -111,7 +111,7 @@ Some endpoints are not implemented due to performance or complexity consideratio
   stderr. There is no undo.
 - Internal/Auth methods: `login()`, `resume_login()`, `connectapi()`, `download()` - Handled automatically by the library.
 
-If you need any of these endpoints, please [open an issue](https://github.com/Taxuspt/garmin_mcp/issues).
+If you need any of these endpoints, please [open an issue](https://github.com/rvartanov/garmin-mcp/issues).
 
 ## Tool Filtering
 
@@ -393,7 +393,7 @@ The easiest way to add this server to Claude Desktop is via the `.dxt` Desktop E
 
 ### Download and install
 
-1. Download the latest `garmin-mcp.dxt` from the [Releases page](https://github.com/Taxuspt/garmin_mcp/releases).
+1. Download the latest `garmin-mcp.dxt` from the [Releases page](https://github.com/rvartanov/garmin-mcp/releases).
 2. Drag the `.dxt` file into the Claude Desktop window, **or** double-click it, **or** go to **Settings → Extensions → Install Extension** and select the file.
 3. Claude Desktop will prompt you for optional configuration (token path, email, password).
 
@@ -402,7 +402,7 @@ The easiest way to add this server to Claude Desktop is via the `.dxt` Desktop E
 The extension installs and runs the server automatically, but you must authenticate with Garmin once before data can be fetched:
 
 ```bash
-uvx --python 3.12 --from git+https://github.com/Taxuspt/garmin_mcp garmin-mcp-auth
+uvx --python 3.12 --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp-auth
 ```
 
 This saves OAuth tokens to `~/.garminconnect`. After that the server works without any credentials in the config.
@@ -436,7 +436,7 @@ Before adding the server to your MCP client, authenticate once in your terminal:
 ```bash
 
 # Install and run authentication tool
-uvx --python 3.12 --from git+https://github.com/Taxuspt/garmin_mcp garmin-mcp-auth
+uvx --python 3.12 --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp-auth
 
 # You'll be prompted for:
 # - Email (or set GARMIN_EMAIL env var)
@@ -474,7 +474,7 @@ Add to your Claude Desktop MCP settings **WITHOUT** credentials:
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/Taxuspt/garmin_mcp",
+        "git+https://github.com/rvartanov/garmin-mcp",
         "garmin-mcp"
       ]
     }
@@ -519,14 +519,14 @@ is equivalent.
   "mcpServers": {
     "garmin-alice": {
       "command": "uvx",
-      "args": ["--python", "3.12", "--from", "git+https://github.com/Taxuspt/garmin_mcp", "garmin-mcp"],
+      "args": ["--python", "3.12", "--from", "git+https://github.com/rvartanov/garmin-mcp", "garmin-mcp"],
       "env": {
         "GARMINTOKENS": "${HOME}/.garminconnect-alice"
       }
     },
     "garmin-bob": {
       "command": "uvx",
-      "args": ["--python", "3.12", "--from", "git+https://github.com/Taxuspt/garmin_mcp", "garmin-mcp"],
+      "args": ["--python", "3.12", "--from", "git+https://github.com/rvartanov/garmin-mcp", "garmin-mcp"],
       "env": {
         "GARMINTOKENS": "${HOME}/.garminconnect-bob"
       }
@@ -665,7 +665,7 @@ For Claude Desktop, add `GARMIN_IS_CN` to the `env` section:
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/Taxuspt/garmin_mcp",
+        "git+https://github.com/rvartanov/garmin-mcp",
         "garmin-mcp"
       ],
       "env": {
@@ -712,7 +712,7 @@ You have two options to run the MCP locally with Claude.
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/Taxuspt/garmin_mcp",
+        "git+https://github.com/rvartanov/garmin-mcp",
         "garmin-mcp"
       ],
       "env": {
@@ -757,7 +757,7 @@ Codex uses TOML for MCP server configuration. Add one of the following entries t
 You can also ask your MCP-capable client to set this up for you. For example:
 
 ```text
-Install the Garmin MCP server from https://github.com/Taxuspt/garmin_mcp, authenticate with garmin-mcp-auth, and add it to my MCP configuration without storing my Garmin email or password.
+Install the Garmin MCP server from https://github.com/rvartanov/garmin-mcp, authenticate with garmin-mcp-auth, and add it to my MCP configuration without storing my Garmin email or password.
 ```
 
 #### Directly from GitHub without cloning the repo
@@ -769,7 +769,7 @@ args = [
   "--python",
   "3.12",
   "--from",
-  "git+https://github.com/Taxuspt/garmin_mcp",
+  "git+https://github.com/rvartanov/garmin-mcp",
   "garmin-mcp"
 ]
 ```
@@ -798,7 +798,7 @@ Restart your MCP client after saving the file.
 This repo ships an [`opencode.json`](./opencode.json) that runs the MCP via `uv run garmin-mcp`, so it always tracks the working tree.
 
 ```bash
-git clone https://github.com/Taxuspt/garmin_mcp.git
+git clone https://github.com/rvartanov/garmin-mcp.git
 cd garmin_mcp
 uv sync                # install dependencies
 garmin-mcp-auth        # one-time Garmin login (skip if ~/.garminconnect already exists)
@@ -828,7 +828,7 @@ Add the server to your global opencode config at `~/.config/opencode/opencode.js
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/Taxuspt/garmin_mcp",
+        "git+https://github.com/rvartanov/garmin-mcp",
         "garmin-mcp"
       ],
       "enabled": true,
@@ -1019,7 +1019,7 @@ which uvx
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/Taxuspt/garmin_mcp",
+        "git+https://github.com/rvartanov/garmin-mcp",
         "garmin-mcp"
       ]
     }
@@ -1121,7 +1121,7 @@ chmod 600 ~/.garmin_email ~/.garmin_password
 
 # Run the authentication CLI before starting the server
 GARMIN_EMAIL_FILE=~/.garmin_email GARMIN_PASSWORD_FILE=~/.garmin_password \
-  uvx --python 3.12 --from git+https://github.com/Taxuspt/garmin_mcp garmin-mcp-auth
+  uvx --python 3.12 --from git+https://github.com/rvartanov/garmin-mcp garmin-mcp-auth
 
 # Enter MFA code when prompted
 # Tokens will be saved automatically
@@ -1139,7 +1139,7 @@ After initial authentication, configure Claude Desktop **without** credentials (
         "--python",
         "3.12",
         "--from",
-        "git+https://github.com/Taxuspt/garmin_mcp",
+        "git+https://github.com/rvartanov/garmin-mcp",
         "garmin-mcp"
       ]
     }
