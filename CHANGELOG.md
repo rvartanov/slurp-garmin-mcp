@@ -81,6 +81,11 @@ All notable changes to Slurp garmin-mcp. The format follows
   `get_menstrual_overview`, `log_menstrual_day`, `set_menstrual_periods`,
   `confirm_menstrual_period`, `update_menstrual_settings` and
   `get_golf_data`.
+- The compact output of the extended tools also leaves out fields that are
+  null, false or empty, and device lists keep 13 key fields per device;
+  `detail=true` returns Garmin's full response. `get_device_data`,
+  `get_profile_data`, `get_calendar_overview` and `get_pace_bands` gain
+  `detail`.
 
 ### Changed
 

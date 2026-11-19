@@ -155,3 +155,11 @@ async def test_get_golf_data(app, mock_garmin_client):
     mock_garmin_client.get_golf_shot_data.assert_called_once_with(4, "1,2")
     assert "hole numbers" in await _call(app, "get_golf_data", {"kind": "shots", "scorecard_id": 4, "holes": "a"})
     assert "scorecard_id is required" in await _call(app, "get_golf_data", {"kind": "scorecard"})
+
+
+async def test_device_lists_are_summarised(app, mock_garmin_client):
+    device = {"deviceId": 3, "productDisplayName": "Forerunner 965", "imageUrl": "x", "featureFlagA": True}
+    mock_garmin_client.get_historical_devices.return_value = [device]
+    assert json.loads(await _call(app, "get_device_data", {"kind": "historical"})) == [
+        {"deviceId": 3, "productDisplayName": "Forerunner 965"}]
+    assert json.loads(await _call(app, "get_device_data", {"kind": "historical", "detail": True})) == [device]

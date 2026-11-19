@@ -170,13 +170,15 @@ def register_tools(app):
 
     @app.tool()
     async def get_calendar_overview(view: str = "week", date: Optional[str] = None,
-                                    first_day_of_week: int = 1) -> str:
+                                    first_day_of_week: int = 1, detail: bool = False) -> str:
         """Get the Garmin Connect calendar for a week (all items) or a year (which days have items)
 
         Args:
             view: week or year (default week)
             date: A day in the week, or in the year, YYYY-MM-DD (default today)
             first_day_of_week: 1 = Monday ... 7 = Sunday, for view=week (default 1)
+            detail: true for the full items; by default empty and false fields
+                are left out
         """
         try:
             day = _date(date, "date", default_today=True)
@@ -188,7 +190,7 @@ def register_tools(app):
                 data = garmin_client.get_calendar_year(int(day[:4]))
             else:
                 return "view must be week or year"
-            return _result(data, f"No calendar items for that {key}.", False)
+            return _result(data, f"No calendar items for that {key}.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:
@@ -383,10 +385,15 @@ def register_tools(app):
             return tracker.error(e)
 
     @app.tool()
-    async def get_pace_bands() -> str:
-        """List your PacePro pace bands (pace plans per split for a course or distance)"""
+    async def get_pace_bands(detail: bool = False) -> str:
+        """List your PacePro pace bands (pace plans per split for a course or distance)
+
+        Args:
+            detail: true for every split; by default long split lists are
+                shortened and empty fields left out
+        """
         try:
-            return _result(garmin_client.get_pace_bands(), "No PacePro pace bands.")
+            return _result(garmin_client.get_pace_bands(), "No PacePro pace bands.", detail)
         except Exception as e:
             return f"Error retrieving pace bands: {str(e)}"
 
