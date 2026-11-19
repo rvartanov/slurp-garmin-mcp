@@ -24,6 +24,7 @@ from garmin_mcp import (
     training_extra,
     activities_extra,
     equipment_extra,
+    account_extra,
     challenges,
     courses,
     data_management,
@@ -64,6 +65,7 @@ MODULES = [
     training_extra,
     activities_extra,
     equipment_extra,
+    account_extra,
 ]
 
 MANIFEST_PATH = Path(__file__).resolve().parent.parent / "dxt" / "manifest.json"

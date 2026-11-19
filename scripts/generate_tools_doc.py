@@ -47,6 +47,7 @@ MODULE_TITLES = {
     "training_extra": "Training plans, calendar and courses (extended)",
     "activities_extra": "Activities (extended)",
     "equipment_extra": "Workout library, body and gear (extended)",
+    "account_extra": "Achievements, goals, devices, profile, women's health and golf (extended)",
 }
 
 
