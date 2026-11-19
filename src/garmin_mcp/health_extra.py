@@ -68,10 +68,32 @@ def _dump(value: Any) -> str:
     return json.dumps(value, indent=2, ensure_ascii=False, default=str)
 
 
-def _result(value: Any, empty: str) -> str:
+# Lists longer than this are summarised unless the caller asks for detail:
+# per-minute sleep and movement arrays run to hundreds of kilobytes, which
+# would fill a chat's context with samples nobody reads.
+_COMPACT_LIST_LIMIT = 60
+
+
+def _compact(value: Any) -> Any:
+    """Replace long lists inside value by their length plus first and last item."""
+    if isinstance(value, dict):
+        return {key: _compact(item) for key, item in value.items()}
+    if isinstance(value, list):
+        if len(value) > _COMPACT_LIST_LIMIT:
+            return {
+                "omitted_items": len(value),
+                "first": _compact(value[0]),
+                "last": _compact(value[-1]),
+                "note": "long series shortened; call again with detail=true for every item",
+            }
+        return [_compact(item) for item in value]
+    return value
+
+
+def _result(value: Any, empty: str, detail: bool = True) -> str:
     if value is None or value == [] or value == {}:
         return empty
-    return _dump(value)
+    return _dump(value if detail else _compact(value))
 
 
 def _flights(value: Any) -> list:
@@ -152,7 +174,7 @@ def register_tools(app):
     """Register the extended health tools with the MCP server app"""
 
     @app.tool()
-    async def get_health_stats(metric: str, start_date: str, end_date: str) -> str:
+    async def get_health_stats(metric: str, start_date: str, end_date: str, detail: bool = False) -> str:
         """Get a daily health series from Garmin Connect for a date range (one value set per day)
 
         One tool for many series; pick it with metric:
@@ -168,18 +190,20 @@ def register_tools(app):
             metric: Which series, see the list above
             start_date: First day, YYYY-MM-DD
             end_date: Last day, YYYY-MM-DD (at most 366 days after start_date)
+            detail: true for every sample; by default long series are shortened
         """
         try:
             fetch = _choice(metric, _DAILY_SERIES, "metric")
             start, end = _range(start_date, end_date)
-            return _result(fetch(start, end), f"No {metric} data between {start} and {end}.")
+            return _result(fetch(start, end), f"No {metric} data between {start} and {end}.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:
             return f"Error retrieving {metric}: {str(e)}"
 
     @app.tool()
-    async def get_health_trend(metric: str, end_date: Optional[str] = None, periods: int = 4) -> str:
+    async def get_health_trend(metric: str, end_date: Optional[str] = None, periods: int = 4,
+                               detail: bool = False) -> str:
         """Get weekly or monthly health totals from Garmin Connect, ending at a date
 
         metric: heart_rate_weekly (incl. abnormal heart rate alerts),
@@ -190,19 +214,20 @@ def register_tools(app):
             metric: Which trend, see the list above
             end_date: Last day, YYYY-MM-DD (default today)
             periods: Number of weeks or months (default 4, at most 52)
+            detail: true for every sample; by default long series are shortened
         """
         try:
             fetch = _choice(metric, _TRENDS, "metric")
             end = _date(end_date, "end_date", default_today=True)
             count = _positive(periods, "periods", 52)
-            return _result(fetch(end, count), f"No {metric} data up to {end}.")
+            return _result(fetch(end, count), f"No {metric} data up to {end}.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:
             return f"Error retrieving {metric}: {str(e)}"
 
     @app.tool()
-    async def get_health_day(kind: str, date: Optional[str] = None) -> str:
+    async def get_health_day(kind: str, date: Optional[str] = None, detail: bool = False) -> str:
         """Get one day's health detail from Garmin Connect
 
         kind: intensity_minutes, hourly_intensity_minutes (this week only),
@@ -214,11 +239,13 @@ def register_tools(app):
         Args:
             kind: Which detail, see the list above
             date: Day, YYYY-MM-DD (default today)
+            detail: true for every sample (sleep and movement carry per-minute
+                arrays); by default long series are shortened
         """
         try:
             fetch = _choice(kind, _DAY_DETAILS, "kind")
             day = _date(date, "date", default_today=True)
-            return _result(fetch(day), f"No {kind} data for {day}.")
+            return _result(fetch(day), f"No {kind} data for {day}.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:
@@ -262,7 +289,7 @@ def register_tools(app):
             result: Dict[str, Any] = {"summary": garmin_client.get_health_snapshot(day, snapshot_id)}
             if include_samples:
                 result["samples"] = garmin_client.get_health_snapshot_epochs(snapshot_id)
-            return _dump(result)
+            return _dump(result if include_samples else _compact(result))
         except ValueError as e:
             return str(e)
         except Exception as e:
