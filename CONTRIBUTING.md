@@ -77,6 +77,11 @@ git fetch upstream
 git merge upstream/main
 ```
 
+The `Upstream watch` workflow checks upstream every Monday and keeps one issue
+(label `upstream-sync`) with the unmerged commits and the files both sides
+changed. Run it by hand from the Actions tab, or locally with
+`git fetch upstream && DRY_RUN=1 scripts/check_upstream.sh`.
+
 Fixes that are not specific to this fork are best contributed upstream as
 well.
 
