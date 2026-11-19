@@ -227,3 +227,10 @@ async def test_nested_long_lists_are_shortened(app, mock_garmin_client):
     mock_garmin_client.get_daily_summaries.return_value = [{"day": i, "samples": list(range(100))} for i in range(3)]
     compact = json.loads(await _call(app, "get_health_stats", {"metric": "daily_summaries", "start_date": START, "end_date": END}))
     assert len(compact) == 3 and compact[0]["samples"]["omitted_items"] == 100
+
+
+async def test_empty_and_false_fields_are_left_out_by_default(app, mock_garmin_client):
+    mock_garmin_client.get_naps.return_value = {"a": 0, "b": None, "c": False, "d": "", "e": [], "f": {"g": None}, "h": True}
+    assert json.loads(await _call(app, "get_health_day", {"kind": "naps", "date": START})) == {"a": 0, "h": True}
+    full = json.loads(await _call(app, "get_health_day", {"kind": "naps", "date": START, "detail": True}))
+    assert full["c"] is False and full["b"] is None

@@ -74,17 +74,28 @@ def _dump(value: Any) -> str:
 _COMPACT_LIST_LIMIT = 60
 
 
+def _is_empty(value: Any) -> bool:
+    return value is None or value is False or value == "" or value == [] or value == {}
+
+
 def _compact(value: Any) -> Any:
-    """Replace long lists inside value by their length plus first and last item."""
+    """Shorten a Garmin response for a chat.
+
+    Long lists become their length plus first and last item, and fields
+    that are null, false or empty are left out (most of Garmin's flags are
+    false). detail=true in the tools returns the response unchanged.
+    """
     if isinstance(value, dict):
-        return {key: _compact(item) for key, item in value.items()}
+        compacted = {key: _compact(item) for key, item in value.items()}
+        return {key: item for key, item in compacted.items() if not _is_empty(item)}
     if isinstance(value, list):
         if len(value) > _COMPACT_LIST_LIMIT:
             return {
                 "omitted_items": len(value),
                 "first": _compact(value[0]),
                 "last": _compact(value[-1]),
-                "note": "long series shortened; call again with detail=true for every item",
+                "note": "long series shortened; call again with detail=true for every item "
+                        "(fields that are null, false or empty are also left out)",
             }
         return [_compact(item) for item in value]
     return value

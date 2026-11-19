@@ -39,6 +39,21 @@ def _result(value: Any, empty: str, detail: bool = False) -> str:
     return _dump(value if detail else _compact(value))
 
 
+# Fields kept per device in device lists unless detail=true; a device
+# record has ~320 fields (feature flags, image urls, ...).
+_DEVICE_FIELDS = (
+    "deviceId", "unitId", "displayName", "productDisplayName", "deviceTypePk",
+    "partNumber", "currentFirmwareVersion", "deviceStatus", "primaryActivityTrackerIndicator",
+    "primaryTrainingDevice", "registeredDate", "lastUsed", "actualProductSku",
+)
+
+
+def _device_summaries(value: Any) -> Any:
+    if isinstance(value, list):
+        return [{k: d[k] for k in _DEVICE_FIELDS if k in d} if isinstance(d, dict) else d for d in value]
+    return value
+
+
 def _need(value: Any, name: str) -> Any:
     if value is None or value == "":
         raise ValueError(f"{name} is required for this kind")
@@ -184,7 +199,8 @@ def register_tools(app):
 
     @app.tool()
     async def get_device_data(kind: str = "active", device_id: Optional[int] = None,
-                              start_date: Optional[str] = None, end_date: Optional[str] = None) -> str:
+                              start_date: Optional[str] = None, end_date: Optional[str] = None,
+                              detail: bool = False) -> str:
         """Get device, sensor and device-message information from Garmin Connect
 
         kind: active, all (including inactive), historical, registration
@@ -199,6 +215,9 @@ def register_tools(app):
             device_id: Device id for the per-device kinds (from kind=active)
             start_date: First day for solar_gain, YYYY-MM-DD
             end_date: Last day for solar_gain, YYYY-MM-DD
+            detail: true for Garmin's full records (~320 fields per device);
+                by default device lists keep their key fields and empty
+                fields are left out
         """
         try:
             key = (kind or "").strip().lower()
@@ -219,7 +238,9 @@ def register_tools(app):
                 data = per_device[key](_positive(_need(device_id, "device_id"), "device_id"))
             else:
                 data = _choice(key, general, "kind")()
-            return _result(data, f"No {key} device data.")
+                if not detail and key in ("active", "all", "historical"):
+                    data = _device_summaries(data)
+            return _result(data, f"No {key} device data.", detail)
         except ValueError as e:
             if "Unknown kind" in str(e):
                 return ("Unknown kind; choose one of: active, all, historical, registration, app_info, "
@@ -287,7 +308,7 @@ def register_tools(app):
     # ---- profile --------------------------------------------------------
 
     @app.tool()
-    async def get_profile_data(kind: str = "personal_information") -> str:
+    async def get_profile_data(kind: str = "personal_information", detail: bool = False) -> str:
         """Get profile information from Garmin Connect
 
         kind: personal_information (birth date, gender, locale, biometrics,
@@ -297,6 +318,8 @@ def register_tools(app):
 
         Args:
             kind: Which data, see the list above (default personal_information)
+            detail: true for the full response; by default empty and false
+                fields are left out
         """
         try:
             options = {
@@ -306,7 +329,7 @@ def register_tools(app):
                 "privacy": lambda: garmin_client.get_privacy_settings(),
                 "usage_indicators": lambda: garmin_client.get_usage_indicators(),
             }
-            return _result(_choice(kind, options, "kind")(), f"No {kind} data.", True)
+            return _result(_choice(kind, options, "kind")(), f"No {kind} data.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:
