@@ -17,6 +17,8 @@ All notable changes to Slurp garmin-mcp. The format follows
   (merges changes into the full event, keeps its id), `delete_calendar_event`
   (asks for confirmation first) and `update_workout` (replaces a workout in
   place, keeping its id and schedules; upstream #523).
+- `create_race_event`: add a race or goal event to the Garmin calendar, with
+  distance, local start time, goal time and note.
 
 ### Changed
 

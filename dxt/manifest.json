@@ -100,6 +100,10 @@
       "description": "Log a manual activity in Garmin Connect \u2014 useful for activities done without a watch."
     },
     {
+      "name": "create_race_event",
+      "description": "Add a race or goal event to the Garmin Connect calendar"
+    },
+    {
       "name": "create_run_interval_workout",
       "description": "Create a repeat-based interval run workout and upload it to Garmin Connect."
     },
