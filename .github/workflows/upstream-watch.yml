@@ -1,22 +1,25 @@
 name: Upstream watch
 
-# Weekly check for new commits in Taxuspt/garmin_mcp; keeps one issue
-# (label upstream-sync) up to date. See scripts/check_upstream.sh.
+# Weekly check for new commits in Taxuspt/garmin_mcp. A clean merge whose
+# tests pass is merged through a pull request (scripts/merge_upstream.sh);
+# anything else is reported in one issue labelled upstream-sync
+# (scripts/check_upstream.sh), which closes itself once upstream is merged.
 on:
   schedule:
     - cron: '17 6 * * 1'   # Mondays 06:17 UTC
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
 
 concurrency:
   group: upstream-watch
   cancel-in-progress: false
 
 jobs:
-  check:
+  sync:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -24,12 +27,27 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Set up Python
+      run: uv python install 3.12
+
     - name: Fetch upstream
       run: |
         git remote add upstream https://github.com/Taxuspt/garmin_mcp.git
         git fetch --no-tags upstream main
 
-    - name: Report unmerged upstream commits
+    - name: Merge upstream when clean and green
+      id: merge
       env:
         GH_TOKEN: ${{ github.token }}
-      run: bash scripts/check_upstream.sh
+        UV_PYTHON: '3.12'
+      run: bash scripts/merge_upstream.sh
+
+    - name: Report what is left
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        git fetch -q origin main && git checkout -q origin/main
+        bash scripts/check_upstream.sh
