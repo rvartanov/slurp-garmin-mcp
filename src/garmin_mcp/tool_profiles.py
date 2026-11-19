@@ -181,6 +181,21 @@ WORKOUTS_TOOLS = CORE_TOOLS | frozenset(
         "schedule_week",
         # calendar_events
         "get_calendar_events",
+        # training_extra
+        "get_training_plans",
+        "get_training_plan",
+        "schedule_training_plan",
+        "delete_training_plan",
+        "get_calendar_overview",
+        "move_calendar_item",
+        "create_calendar_note",
+        "update_calendar_note",
+        "delete_calendar_note",
+        "create_course_from_activity",
+        "update_course",
+        "get_course_favorites",
+        "set_course_favorite",
+        "get_pace_bands",
         # race_events
         "get_calendar_event",
         "get_upcoming_events",

@@ -92,6 +92,14 @@
       "description": "Get total count of activities in the user's Garmin account"
     },
     {
+      "name": "create_calendar_note",
+      "description": "Add a note to a day on the Garmin Connect calendar"
+    },
+    {
+      "name": "create_course_from_activity",
+      "description": "Save a course built from an activity's GPS track"
+    },
+    {
       "name": "create_custom_food",
       "description": "Create a custom food in the user's Garmin nutrition library"
     },
@@ -136,6 +144,10 @@
       "description": "Delete a race or event from the Garmin Connect calendar"
     },
     {
+      "name": "delete_calendar_note",
+      "description": "Delete a calendar note"
+    },
+    {
       "name": "delete_course",
       "description": "Delete a course from Garmin Connect."
     },
@@ -150,6 +162,10 @@
     {
       "name": "delete_jetlag_trip",
       "description": "Delete a Jet Lag Adviser trip"
+    },
+    {
+      "name": "delete_training_plan",
+      "description": "Remove a scheduled training plan and its workouts from your calendar"
     },
     {
       "name": "delete_weigh_ins",
@@ -292,8 +308,16 @@
       "description": "Get races and events on the Garmin Connect calendar between two dates"
     },
     {
+      "name": "get_calendar_overview",
+      "description": "Get the Garmin Connect calendar for a week (all items) or a year (which days have items)"
+    },
+    {
       "name": "get_course_details",
       "description": "Get full details of a Garmin Connect course by ID."
+    },
+    {
+      "name": "get_course_favorites",
+      "description": "List the courses marked as favourite"
     },
     {
       "name": "get_courses",
@@ -480,6 +504,10 @@
       "description": "Get the estimated one-rep-max history of a strength exercise"
     },
     {
+      "name": "get_pace_bands",
+      "description": "List your PacePro pace bands (pace plans per split for a course or distance)"
+    },
+    {
       "name": "get_performance_history",
       "description": "Get the history of a Garmin performance metric over a date range"
     },
@@ -600,8 +628,16 @@
       "description": "Get Garmin's daily acute and chronic training load over a date range."
     },
     {
+      "name": "get_training_plan",
+      "description": "Get one training plan, optionally with its workout tasks"
+    },
+    {
       "name": "get_training_plan_workouts",
       "description": "Compatibility alias for get_garmin_coach_workouts"
+    },
+    {
+      "name": "get_training_plans",
+      "description": "List Garmin Connect training plans: yours, the ones active on a day, or the catalogue"
     },
     {
       "name": "get_training_readiness",
@@ -672,6 +708,10 @@
       "description": "Quick-add a food entry with macro values to the nutrition log"
     },
     {
+      "name": "move_calendar_item",
+      "description": "Move a calendar item (a scheduled workout, a note, ...) to another day"
+    },
+    {
       "name": "push_workout_to_device",
       "description": "Send a workout from the workout library to a Garmin device"
     },
@@ -686,6 +726,10 @@
     {
       "name": "reschedule_workout",
       "description": "Move a scheduled workout to another date on the Garmin Connect calendar"
+    },
+    {
+      "name": "schedule_training_plan",
+      "description": "Put a training plan from Garmin's catalogue on your calendar from a start date"
     },
     {
       "name": "schedule_week",
@@ -732,6 +776,10 @@
       "description": "Set blood pressure values"
     },
     {
+      "name": "set_course_favorite",
+      "description": "Mark a course as favourite, or remove the mark"
+    },
+    {
       "name": "set_fit_download_dir",
       "description": "Set and persist the default directory for downloaded activity files."
     },
@@ -766,6 +814,14 @@
     {
       "name": "update_calendar_event",
       "description": "Change fields of an existing Garmin Connect calendar event in place"
+    },
+    {
+      "name": "update_calendar_note",
+      "description": "Change a calendar note's day, title or text (all three are written)"
+    },
+    {
+      "name": "update_course",
+      "description": "Change fields of an existing course in place (name, description, activity type, ...)"
     },
     {
       "name": "update_custom_food",
