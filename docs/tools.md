@@ -393,7 +393,7 @@ Module `garmin_mcp.equipment_extra`.
 | Tool | Effect | Profiles | Direct | Description |
 |---|---|---|---|---|
 | `copy_workout` | write | workouts |  | Duplicate a workout in the library under a new name |
-| `create_gear` | write | activities |  | Add a piece of gear (shoes, bike, ...) to Garmin Connect |
+| `create_gear` | write | activities | yes | Add a piece of gear (shoes, bike, ...) to Garmin Connect |
 | `delete_blood_pressure` | write (destructive) | health |  | Delete one blood pressure reading |
 | `delete_gear` | write (destructive) | activities |  | Delete a piece of gear (set_gear_status RETIRED keeps its history) |
 | `delete_weigh_in` | write (destructive) | health |  | Delete one weigh-in (delete_weigh_ins removes all of a day) |
