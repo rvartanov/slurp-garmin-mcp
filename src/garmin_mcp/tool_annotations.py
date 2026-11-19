@@ -22,6 +22,7 @@ ADDITIVE_TOOLS = frozenset(
         "create_custom_food",
         "create_manual_activity",
         "create_race_event",
+        "create_jetlag_trip",
         "create_run_interval_workout",
         "create_run_workout",
         "create_strength_workout",
@@ -51,6 +52,7 @@ DESTRUCTIVE_TOOLS = frozenset(
     {
         "delete_activity",
         "delete_calendar_event",
+        "delete_jetlag_trip",
         "delete_course",
         "delete_custom_food",
         "delete_food_log",
@@ -58,7 +60,9 @@ DESTRUCTIVE_TOOLS = frozenset(
         "delete_workout",
         "delete_workouts",
         "update_calendar_event",
+        "update_jetlag_trip",
         "update_workout",
+        "set_steps_goal",
         "download_activity_file",
         "download_course_gpx",
         "download_workout",
@@ -85,7 +89,8 @@ DESTRUCTIVE_TOOLS = frozenset(
 # intentionally excluded even though its existing-workout path is guarded.
 IDEMPOTENT_TOOLS = frozenset(
     {"reschedule_workout", "schedule_week", "schedule_workout",
-     "update_calendar_event", "update_workout"}
+     "update_calendar_event", "update_workout",
+     "update_jetlag_trip", "set_steps_goal"}
 )
 
 
@@ -126,7 +131,15 @@ READ_ONLY_TOOLS = frozenset(
         "get_body_battery",
         "get_body_battery_events",
         "get_body_composition",
+        "get_account_stats",
         "get_calendar_event",
+        "get_ecg",
+        "get_ecg_recordings",
+        "get_health_day",
+        "get_health_snapshot",
+        "get_health_stats",
+        "get_health_trend",
+        "get_jetlag_trips",
         "get_calendar_events",
         "get_primary_event",
         "get_upcoming_events",

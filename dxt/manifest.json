@@ -96,6 +96,10 @@
       "description": "Create a custom food in the user's Garmin nutrition library"
     },
     {
+      "name": "create_jetlag_trip",
+      "description": "Create a Jet Lag Adviser trip so the watch guides light, sleep and caffeine timing"
+    },
+    {
       "name": "create_manual_activity",
       "description": "Log a manual activity in Garmin Connect \u2014 useful for activities done without a watch."
     },
@@ -144,6 +148,10 @@
       "description": "Delete a food log entry"
     },
     {
+      "name": "delete_jetlag_trip",
+      "description": "Delete a Jet Lag Adviser trip"
+    },
+    {
       "name": "delete_weigh_ins",
       "description": "Delete weight measurements for a specific date"
     },
@@ -170,6 +178,10 @@
     {
       "name": "get_acclimation",
       "description": "Get heat and altitude acclimation status for a given date."
+    },
+    {
+      "name": "get_account_stats",
+      "description": "Get account-wide Garmin Connect totals and status"
     },
     {
       "name": "get_activities",
@@ -328,6 +340,14 @@
       "description": "Get earned badges for user"
     },
     {
+      "name": "get_ecg",
+      "description": "Get one ECG recording, including its waveform"
+    },
+    {
+      "name": "get_ecg_recordings",
+      "description": "List ECG app recordings (rhythm classification, heart rate, time)"
+    },
+    {
       "name": "get_endurance_score",
       "description": "Get endurance score data between dates"
     },
@@ -360,6 +380,22 @@
       "description": "Get Garmin Connect goals (active, future, or past)."
     },
     {
+      "name": "get_health_day",
+      "description": "Get one day's health detail from Garmin Connect"
+    },
+    {
+      "name": "get_health_snapshot",
+      "description": "Get one Health Snapshot session (2-minute HR, HRV, SpO2, respiration, stress check)"
+    },
+    {
+      "name": "get_health_stats",
+      "description": "Get a daily health series from Garmin Connect for a date range (one value set per day)"
+    },
+    {
+      "name": "get_health_trend",
+      "description": "Get weekly or monthly health totals from Garmin Connect, ending at a date"
+    },
+    {
       "name": "get_heart_rate_zones",
       "description": "Get the user's saved heart-rate training-zone configuration."
     },
@@ -390,6 +426,10 @@
     {
       "name": "get_inprogress_virtual_challenges",
       "description": "Get in-progress virtual challenges/expeditions"
+    },
+    {
+      "name": "get_jetlag_trips",
+      "description": "List Jet Lag Adviser trips with their flights"
     },
     {
       "name": "get_lactate_threshold",
@@ -688,6 +728,10 @@
       "description": "Set the perceived effort (RPE) for an activity."
     },
     {
+      "name": "set_steps_goal",
+      "description": "Set a manual daily step goal, or go back to the watch's automatic goal"
+    },
+    {
       "name": "unschedule_workout",
       "description": "Remove a scheduled workout from the Garmin Connect calendar"
     },
@@ -702,6 +746,10 @@
     {
       "name": "update_custom_food",
       "description": "Update an existing custom food in the user's Garmin nutrition library"
+    },
+    {
+      "name": "update_jetlag_trip",
+      "description": "Replace a Jet Lag Adviser trip (dates and all flights)"
     },
     {
       "name": "update_workout",
