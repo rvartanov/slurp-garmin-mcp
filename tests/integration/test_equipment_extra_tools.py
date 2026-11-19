@@ -126,14 +126,38 @@ async def test_get_gear_data(app, mock_garmin_client):
 
 
 async def test_create_gear(app, mock_garmin_client):
-    mock_garmin_client.create_gear.return_value = {"uuid": UUID}
-    await _call(app, "create_gear", {"gear_type": "shoes", "brand": "ASICS", "model": "Novablast", "name": "Blauw",
-                                     "first_use_date": DAY, "max_usage_distance_km": 800, "activity_types": "running, trail_running"})
-    args, kwargs = mock_garmin_client.create_gear.call_args
-    assert args == ("SHOES", "ASICS", "Novablast", "Blauw", DAY)
-    assert kwargs["activity_type_keys"] == ["running", "trail_running"] and kwargs["max_usage_distance_km"] == 800
-    assert "brand must not be empty" in await _call(app, "create_gear", {"gear_type": "SHOES", "brand": "", "model": "x",
+    mock_garmin_client.client.post.return_value = {"uuid": UUID, "name": "Blauw"}
+    result = json.loads(await _call(app, "create_gear", {
+        "gear_type": "shoes", "brand": "ASICS", "model": "Novablast", "name": "Blauw", "first_use_date": DAY,
+        "max_usage_distance_km": 800, "activity_types": "running, trail_running"}))
+    assert result["gear"]["uuid"] == UUID
+    args, kwargs = mock_garmin_client.client.post.call_args
+    assert args == ("connectapi", "/gear-service/gear/v2") and kwargs["api"] is True
+    body = kwargs["json"]
+    assert body["gearType"] == "SHOES" and body["model"] == "Novablast" and body["maxUsageDistanceMeters"] == 800000
+    assert [t["activityTypeKey"] for t in body["associatedActivityTypes"]] == ["running", "trail_running"]
+    assert "brand must not be empty" in await _call(app, "create_gear", {"gear_type": "SHOES", "brand": "",
                                                                           "name": "y", "first_use_date": DAY})
+
+
+async def test_create_gear_sends_the_web_form_payload(app, mock_garmin_client):
+    """Garmin rejects [] and "" (HTTP 400); the web form sends null for empty fields."""
+    mock_garmin_client.client.post.return_value = {"uuid": UUID}
+    await _call(app, "create_gear", {"gear_type": "SHOES", "brand": "ASICS", "name": "Test", "first_use_date": DAY})
+    body = mock_garmin_client.client.post.call_args.kwargs["json"]
+    assert body == {"uuid": None, "gearType": "SHOES", "brand": "ASICS", "model": None, "name": "Test",
+                    "firstUseDate": DAY, "usageType": "DISTANCE", "maxUsageDistanceMeters": 0,
+                    "maxUsageDurationSeconds": 0, "maxUsageDate": None, "associatedActivityTypes": None,
+                    "notes": None}
+    mock_garmin_client.create_gear.assert_not_called()
+
+
+async def test_create_gear_unexpected_response(app, mock_garmin_client):
+    mock_garmin_client.client.post.return_value = "<html>"
+    assert "Unexpected response" in await _call(app, "create_gear", {"gear_type": "SHOES", "brand": "ASICS",
+                                                                      "name": "Test", "first_use_date": DAY})
+    assert "negative" in await _call(app, "create_gear", {"gear_type": "SHOES", "brand": "ASICS", "name": "Test",
+                                                          "first_use_date": DAY, "max_usage_distance_km": -1})
 
 
 async def test_update_gear(app, mock_garmin_client):

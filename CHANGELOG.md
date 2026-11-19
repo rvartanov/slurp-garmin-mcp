@@ -111,6 +111,11 @@ All notable changes to Slurp garmin-mcp. The format follows
 
 ### Fixed
 
+- `create_gear` works: it now sends the payload of the Garmin Connect web
+  form (`null` for empty notes, model and activity types). garminconnect
+  0.3.20 sends `[]` and `""` there and Garmin answered HTTP 400. `model` is
+  now optional, as in the web form.
+
 Taken from open upstream pull requests (authorship kept, `cherry picked from` in each commit):
 
 - Recovery time right after a workout was reported as 0 h when Garmin kept a

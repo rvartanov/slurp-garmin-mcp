@@ -27,6 +27,32 @@ _GEAR_FIELDS = (
 )
 
 
+# garminconnect 0.3.20's create_gear sends "associatedActivityTypes": [] and
+# "notes": "" and Garmin answers HTTP 400; the web app's "Add Gear" form sends
+# null for both (captured 2026-11-19), so create_gear posts that payload itself.
+_GEAR_V2_URL = "/gear-service/gear/v2"
+
+
+def _gear_payload(gear_type: str, brand: str, model: str, name: str, day: str, usage_type: str,
+                  max_km: Optional[float], max_min: Optional[float], notes: str, keys: list) -> Dict[str, Any]:
+    """Build the gear v2 create payload exactly as the Garmin Connect web form does."""
+    return {
+        "uuid": None,
+        "gearType": gear_type.upper(),
+        "brand": brand.strip(),
+        "model": (model or "").strip() or None,
+        "name": name.strip(),
+        "firstUseDate": day,
+        "usageType": usage_type.upper(),
+        "maxUsageDistanceMeters": int(round(max_km * 1000)) if max_km else 0,
+        "maxUsageDurationSeconds": int(round(max_min * 60)) if max_min else 0,
+        "maxUsageDate": None,
+        "associatedActivityTypes": [{"activityTypeKey": k, "defaultGear": True, "preferredGear": False}
+                                    for k in keys] or None,
+        "notes": notes or None,
+    }
+
+
 def configure(client):
     """Configure the module with the Garmin client instance"""
     global garmin_client
@@ -393,7 +419,7 @@ def register_tools(app):
             return f"Error retrieving gear data: {str(e)}"
 
     @app.tool()
-    async def create_gear(gear_type: str, brand: str, model: str, name: str, first_use_date: str,
+    async def create_gear(gear_type: str, brand: str, name: str, first_use_date: str, model: str = "",
                           usage_type: str = "DISTANCE", max_usage_distance_km: Optional[float] = None,
                           max_usage_duration_min: Optional[float] = None, notes: str = "",
                           activity_types: str = "") -> str:
@@ -401,10 +427,10 @@ def register_tools(app):
 
         Args:
             gear_type: Gear type key, e.g. SHOES or BIKE (see get_gear_data kind=types)
-            brand: Brand, e.g. ASICS
-            model: Model, e.g. Novablast 5
+            brand: Brand, e.g. ASICS (get_gear_data kind=make_models lists Garmin's catalogue)
             name: Your name for it
             first_use_date: First use, YYYY-MM-DD
+            model: Model, e.g. Dynablast 4 (optional)
             usage_type: DISTANCE or TIME tracking (default DISTANCE)
             max_usage_distance_km: Retire reminder after this distance
             max_usage_duration_min: Retire reminder after this duration
@@ -416,18 +442,22 @@ def register_tools(app):
             for label, value in (("gear_type", gear_type), ("usage_type", usage_type)):
                 if not _KEY_RE.match(value or ""):
                     return f"{label} must be a key such as SHOES or DISTANCE"
-            for label, value in (("brand", brand), ("model", model), ("name", name)):
+            for label, value in (("brand", brand), ("name", name)):
                 if not isinstance(value, str) or not value.strip():
                     return f"{label} must not be empty"
             day = _date(first_use_date, "first_use_date")
-            keys = [k.strip() for k in (activity_types or "").split(",") if k.strip()] or None
+            for label, value in (("max_usage_distance_km", max_usage_distance_km),
+                                 ("max_usage_duration_min", max_usage_duration_min)):
+                if value is not None and value < 0:
+                    return f"{label} must not be negative"
+            keys = [k.strip() for k in (activity_types or "").split(",") if k.strip()]
+            payload = _gear_payload(gear_type, brand, model, name, day, usage_type, max_usage_distance_km,
+                                    max_usage_duration_min, notes, keys)
             tracker.sending()
-            gear = garmin_client.create_gear(gear_type.upper(), brand.strip(), model.strip(), name.strip(), day,
-                                             usage_type=usage_type.upper(),
-                                             max_usage_distance_km=max_usage_distance_km,
-                                             max_usage_duration_min=max_usage_duration_min,
-                                             notes=notes or "", activity_type_keys=keys)
+            gear = garmin_client.client.post("connectapi", _GEAR_V2_URL, json=payload, api=True)
             tracker.committed()
+            if not isinstance(gear, dict) or not gear.get("uuid"):
+                return f"Unexpected response from Garmin when creating gear: {str(gear)[:300]}"
             return _dump({"status": "success", "gear": gear})
         except ValueError as e:
             return str(e)
