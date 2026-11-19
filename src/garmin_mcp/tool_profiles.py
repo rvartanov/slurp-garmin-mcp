@@ -112,6 +112,15 @@ HEALTH_TOOLS = CORE_TOOLS | frozenset(
 
 ACTIVITIES_TOOLS = CORE_TOOLS | frozenset(
     {
+        # activities_extra
+        "get_activity_data",
+        "find_activities",
+        "get_activity_aggregates",
+        "get_activity_event_types",
+        "set_activity_favorite",
+        "update_activity",
+        "create_activity_from_json",
+        "upload_activity_file",
         # activity_management
         "count_activities",
         "create_manual_activity",

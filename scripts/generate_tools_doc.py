@@ -45,6 +45,7 @@ MODULE_TITLES = {
     "health_extra": "Health (extended)",
     "metrics_extra": "Performance metrics (extended)",
     "training_extra": "Training plans, calendar and courses (extended)",
+    "activities_extra": "Activities (extended)",
 }
 
 
