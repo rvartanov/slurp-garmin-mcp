@@ -5,6 +5,13 @@ on `https://<machine>.<tailnet>.ts.net` with a valid certificate, without
 opening a port on your router. It adds no authentication of its own, so the
 server must run with a URL secret or bearer token.
 
+Funnel forwards the public host name, so list it in the environment file or
+the server answers `421 Invalid Host header`:
+
+```
+GARMIN_MCP_ALLOWED_HOSTS=<machine>.<tailnet>.ts.net
+```
+
 ```bash
 # Server on loopback, protected by a URL secret (see deploy/env.example)
 sudo systemctl start slurp-garmin-mcp

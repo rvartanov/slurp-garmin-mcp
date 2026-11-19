@@ -1,6 +1,7 @@
 # Caddy in front of Slurp garmin-mcp (TLS is automatic).
 # The server listens on 127.0.0.1:8000 with GARMIN_MCP_URL_SECRET and/or
 # GARMIN_MCP_HTTP_TOKEN set; Caddy only adds TLS and passes requests through.
+# Caddy forwards the public Host header: set GARMIN_MCP_ALLOWED_HOSTS=garmin.example.com.
 garmin.example.com {
 	# Keep the URL secret out of the access log.
 	log {

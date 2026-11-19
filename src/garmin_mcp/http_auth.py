@@ -22,6 +22,7 @@ import hmac
 import ipaddress
 import logging
 import os
+import re
 
 from starlette.responses import JSONResponse
 
@@ -86,6 +87,74 @@ def resolve_url_secret() -> str | None:
             "(generate one with `openssl rand -hex 32`)"
         )
     return secret
+
+
+# Host header values the MCP SDK accepts by default on a loopback bind.
+_LOOPBACK_HOSTS = ("127.0.0.1:*", "localhost:*", "[::1]:*")
+_LOOPBACK_ORIGINS = ("http://127.0.0.1:*", "http://localhost:*", "http://[::1]:*")
+# hostname, IPv4 or [IPv6], optionally :port or :*
+_HOST_RE = re.compile(r"^(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:.]+\])(?::(?:\d{1,5}|\*))?$")
+_ORIGIN_RE = re.compile(r"^https?://(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:.]+\])(?::(?:\d{1,5}|\*))?$")
+
+
+def _split_list(name: str) -> list[str]:
+    return [item.strip() for item in os.getenv(name, "").split(",") if item.strip()]
+
+
+def resolve_allowed_hosts() -> list[str]:
+    """Read GARMIN_MCP_ALLOWED_HOSTS: extra Host header values to accept.
+
+    A name without a port is accepted with any port and without one (a tunnel
+    usually sends the bare name). Raises ValueError on anything that is not a
+    host[:port], such as a URL or a wildcard.
+    """
+    hosts = []
+    for item in _split_list("GARMIN_MCP_ALLOWED_HOSTS"):
+        if not _HOST_RE.match(item):
+            raise ValueError(
+                f"GARMIN_MCP_ALLOWED_HOSTS: {item!r} is not a host name "
+                "(expected e.g. myhost.example.ts.net or myhost.example.ts.net:8443, "
+                "no scheme, path or wildcard host)"
+            )
+        hosts.append(item)
+        if ":" not in item.rsplit("]", 1)[-1]:
+            hosts.append(f"{item}:*")
+    return hosts
+
+
+def resolve_allowed_origins() -> list[str]:
+    """Read GARMIN_MCP_ALLOWED_ORIGINS: extra Origin header values to accept."""
+    origins = _split_list("GARMIN_MCP_ALLOWED_ORIGINS")
+    for item in origins:
+        if not _ORIGIN_RE.match(item):
+            raise ValueError(
+                f"GARMIN_MCP_ALLOWED_ORIGINS: {item!r} is not an origin "
+                "(expected e.g. https://claude.ai: scheme and host, no path)"
+            )
+    return origins
+
+
+def resolve_transport_security():
+    """DNS-rebinding settings for the MCP SDK, or None for the SDK default.
+
+    The SDK only protects a loopback bind and then accepts loopback Host
+    headers only, so a tunnel that forwards the public Host (Tailscale Funnel)
+    gets 421. With GARMIN_MCP_ALLOWED_HOSTS set, protection is on for every
+    bind address and accepts loopback plus the listed names.
+    """
+    hosts = resolve_allowed_hosts()
+    origins = resolve_allowed_origins()
+    if not hosts:
+        if origins:
+            raise ValueError("GARMIN_MCP_ALLOWED_ORIGINS requires GARMIN_MCP_ALLOWED_HOSTS")
+        return None
+    from mcp.server.transport_security import TransportSecuritySettings
+
+    return TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=[*_LOOPBACK_HOSTS, *hosts],
+        allowed_origins=[*_LOOPBACK_ORIGINS, *origins],
+    )
 
 
 def require_auth() -> bool:

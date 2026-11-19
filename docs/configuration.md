@@ -50,6 +50,19 @@ Details and advice are in [security.md](security.md).
 Both can be set together; a request must then pass both. `/healthz` and
 `/readyz` never need either. Generate a value with `openssl rand -hex 32`.
 
+## Host and Origin checks
+
+On a loopback bind (the default) the MCP SDK protects against DNS rebinding
+and accepts only a loopback `Host` header. A reverse proxy or tunnel that
+forwards the public host name (Tailscale Funnel, Caddy, nginx with
+`proxy_set_header Host $host`) then gets `421 Invalid Host header`. List the
+public names instead of switching the check off:
+
+| Variable | Meaning |
+|---|---|
+| `GARMIN_MCP_ALLOWED_HOSTS` | Comma-separated host names to accept in addition to loopback, e.g. `myhost.tailnet.ts.net`. A name without a port is accepted with any port; `name:8443` accepts only that port. No scheme, path or wildcard host. Setting it also turns the check on for a non-loopback bind. |
+| `GARMIN_MCP_ALLOWED_ORIGINS` | Comma-separated origins to accept in the `Origin` header, e.g. `https://claude.ai`. Requests without an `Origin` header (server-to-server clients) always pass. Requires `GARMIN_MCP_ALLOWED_HOSTS`. |
+
 ## Activity file downloads
 
 | Variable | Default | Meaning |
