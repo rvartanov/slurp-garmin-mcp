@@ -66,6 +66,22 @@ def _find_version(value: Any, version: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def _scheduled_summary(entry: Any) -> Any:
+    """One scheduled workout without the full workout definition (~20 KB each)."""
+    if not isinstance(entry, dict) or not isinstance(entry.get("workout"), dict):
+        return entry
+    workout = entry["workout"]
+    sport = workout.get("sportType") if isinstance(workout.get("sportType"), dict) else {}
+    short = {key: entry.get(key) for key in ("workoutScheduleId", "calendarDate", "race", "priority",
+                                              "associatedActivityId", "tpType") if key in entry}
+    short["workout"] = {key: workout.get(key) for key in ("workoutId", "workoutName", "description",
+                                                          "estimatedDurationInSecs", "estimatedDistanceInMeters",
+                                                          "trainingPlanId") if workout.get(key) is not None}
+    if sport.get("sportTypeKey"):
+        short["workout"]["sport"] = sport["sportTypeKey"]
+    return short
+
+
 _WORKOUT_LIBRARY: Dict[str, Callable[[], Any]] = {
     "count": lambda: garmin_client.get_workout_count(),
     "sport_types": lambda: garmin_client.get_workout_sport_types(),
@@ -100,7 +116,8 @@ def register_tools(app):
             return f"Error retrieving workout library {kind}: {str(e)}"
 
     @app.tool()
-    async def get_upcoming_workouts(start_date: Optional[str] = None, end_date: Optional[str] = None) -> str:
+    async def get_upcoming_workouts(start_date: Optional[str] = None, end_date: Optional[str] = None,
+                                    detail: bool = False) -> str:
         """Get scheduled workouts: the next one, or all in a period (including adaptive plans)
 
         Without dates this returns the earliest upcoming workout.
@@ -108,13 +125,20 @@ def register_tools(app):
         Args:
             start_date: First day, YYYY-MM-DD (with end_date)
             end_date: Last day, YYYY-MM-DD (with start_date)
+            detail: true for each workout's full definition (steps, targets);
+                by default only its name, sport, duration and distance
         """
         try:
             if not start_date and not end_date:
-                return _result(garmin_client.get_next_scheduled_workout(), "No upcoming scheduled workout.")
-            first, last = _range(start_date, end_date)
-            return _result(garmin_client.get_scheduled_workouts_by_period(first, last),
-                           f"No scheduled workouts between {first} and {last}.")
+                data = garmin_client.get_next_scheduled_workout()
+                empty = "No upcoming scheduled workout."
+            else:
+                first, last = _range(start_date, end_date)
+                data = garmin_client.get_scheduled_workouts_by_period(first, last)
+                empty = f"No scheduled workouts between {first} and {last}."
+            if not detail:
+                data = [_scheduled_summary(e) for e in data] if isinstance(data, list) else _scheduled_summary(data)
+            return _result(data, empty, True)
         except ValueError as e:
             return str(e)
         except Exception as e:

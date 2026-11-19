@@ -68,6 +68,9 @@ All notable changes to Slurp garmin-mcp. The format follows
   (gear v2: list, details, activities, types, catalogue search),
   `create_gear`, `update_gear`, `set_gear_status`, `set_gear_default` and
   `delete_gear`.
+- `get_upcoming_workouts` lists each scheduled workout's name, sport,
+  duration and distance unless `detail=true` (two weeks of a training
+  plan went from ~350 KB).
 
 ### Changed
 
