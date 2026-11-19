@@ -212,8 +212,20 @@
       "description": "Download an activity and save it to disk as a file."
     },
     {
+      "name": "download_course_file",
+      "description": "Download a course as a GPX or FIT file"
+    },
+    {
       "name": "download_course_gpx",
       "description": "Download a Garmin Connect course as a GPX file."
+    },
+    {
+      "name": "download_health_snapshot_file",
+      "description": "Download Health Snapshot data: a day's ZIP, or one session as a FIT file"
+    },
+    {
+      "name": "download_report",
+      "description": "Download a PDF report started with request_report, or report its progress while it is being built"
     },
     {
       "name": "download_workout",
@@ -814,6 +826,10 @@
     {
       "name": "request_reload",
       "description": "Request reload of epoch data"
+    },
+    {
+      "name": "request_report",
+      "description": "Start a PDF report export in Garmin Connect (fetch it with download_report)"
     },
     {
       "name": "reschedule_workout",
