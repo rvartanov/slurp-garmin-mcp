@@ -124,6 +124,10 @@
       "description": "Permanently delete an activity from Garmin Connect."
     },
     {
+      "name": "delete_calendar_event",
+      "description": "Delete a race or event from the Garmin Connect calendar"
+    },
+    {
       "name": "delete_course",
       "description": "Delete a course from Garmin Connect."
     },
@@ -258,6 +262,10 @@
     {
       "name": "get_body_composition",
       "description": "Get body composition data for a single date or date range"
+    },
+    {
+      "name": "get_calendar_event",
+      "description": "Get the full details of one Garmin Connect calendar event (race or goal event)"
     },
     {
       "name": "get_calendar_events",
@@ -432,6 +440,10 @@
       "description": "Get pregnancy summary data"
     },
     {
+      "name": "get_primary_event",
+      "description": "Get the primary (focus) race on Garmin Connect, if one is set"
+    },
+    {
       "name": "get_primary_training_device",
       "description": "Get information about the primary training device"
     },
@@ -542,6 +554,10 @@
     {
       "name": "get_unit_system",
       "description": "Get user's preferred unit system from profile"
+    },
+    {
+      "name": "get_upcoming_events",
+      "description": "Get the upcoming races and goal events on the Garmin Connect calendar"
     },
     {
       "name": "get_user_profile",
@@ -676,8 +692,16 @@
       "description": "Remove multiple scheduled workouts from the Garmin Connect calendar"
     },
     {
+      "name": "update_calendar_event",
+      "description": "Change fields of an existing Garmin Connect calendar event in place"
+    },
+    {
       "name": "update_custom_food",
       "description": "Update an existing custom food in the user's Garmin nutrition library"
+    },
+    {
+      "name": "update_workout",
+      "description": "Replace an existing workout in place, keeping its id and schedules"
     },
     {
       "name": "upload_course",
