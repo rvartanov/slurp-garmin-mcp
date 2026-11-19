@@ -211,3 +211,19 @@ async def test_set_steps_goal_rejects_bad_value(app, mock_garmin_client):
 async def test_write_error_is_structured(app, mock_garmin_client):
     mock_garmin_client.set_steps_goal.side_effect = GarminConnectConnectionError("API Error 400 - nope")
     assert json.loads(await _call(app, "set_steps_goal", {"steps": 5000}))["upstream_status"] == 400
+
+
+async def test_long_series_are_shortened_by_default(app, mock_garmin_client):
+    mock_garmin_client.get_daily_sleep.return_value = {"sleepLevels": list(range(500)), "score": 80, "short": [1, 2]}
+    compact = json.loads(await _call(app, "get_health_day", {"kind": "sleep", "date": START}))
+    assert compact["score"] == 80 and compact["short"] == [1, 2]
+    assert compact["sleepLevels"]["omitted_items"] == 500
+    assert compact["sleepLevels"]["first"] == 0 and compact["sleepLevels"]["last"] == 499
+    full = json.loads(await _call(app, "get_health_day", {"kind": "sleep", "date": START, "detail": True}))
+    assert full["sleepLevels"] == list(range(500))
+
+
+async def test_nested_long_lists_are_shortened(app, mock_garmin_client):
+    mock_garmin_client.get_daily_summaries.return_value = [{"day": i, "samples": list(range(100))} for i in range(3)]
+    compact = json.loads(await _call(app, "get_health_stats", {"metric": "daily_summaries", "start_date": START, "end_date": END}))
+    assert len(compact) == 3 and compact[0]["samples"]["omitted_items"] == 100

@@ -27,6 +27,10 @@ All notable changes to Slurp garmin-mcp. The format follows
   nutrition status), plus `get_health_snapshot`, `get_ecg_recordings`,
   `get_ecg` and `get_jetlag_trips`. Writes: `set_steps_goal`,
   `create_jetlag_trip`, `update_jetlag_trip`, `delete_jetlag_trip`.
+- `get_health_stats`, `get_health_trend`, `get_health_day` and
+  `get_health_snapshot` shorten series longer than 60 items to their length,
+  first and last item; `detail=true` returns everything. A day's sleep data
+  went from about 270 KB to a few KB.
 
 ### Changed
 
