@@ -68,7 +68,7 @@ async def test_get_performance_metric_default_date_and_unknown(app, mock_garmin_
     ("fitness_age_weekly", "get_fitness_age_weekly", (END, 4)),
     ("glucose", "get_glucose_data_range", (START, END)),
     ("power_curve_cycling", "get_power_curve", (START, END, "cycling")),
-    ("power_curve_running", "get_power_curve", (START, END, "running")),
+    ("power_curve_rowing", "get_power_curve", (START, END, "rowing")),
 ])
 async def test_get_performance_history_dispatch(app, mock_garmin_client, metric, method, args):
     getattr(mock_garmin_client, method).return_value = [{"v": 1}]
