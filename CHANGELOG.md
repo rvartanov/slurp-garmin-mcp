@@ -31,6 +31,14 @@ All notable changes to Slurp garmin-mcp. The format follows
   `get_health_snapshot` shorten series longer than 60 items to their length,
   first and last item; `detail=true` returns everything. A day's sleep data
   went from about 270 KB to a few KB.
+- Extended performance-metric tools (`metrics_extra` module), covering 35
+  more garminconnect methods: `get_performance_metric` (14 latest values:
+  VO2 max, training status, load balance, heat/altitude and SpO2
+  acclimation, Cycling Ability, Running Economy, Critical Swim Speed,
+  stamina, Fitness Age, one-rep max, glucose, biometrics),
+  `get_performance_history` (15 histories incl. FTP, readiness, power
+  curves), `get_training_zones`, `set_power_zones`,
+  `get_one_rep_max_history` and `get_activity_power_curve`.
 
 ### Changed
 

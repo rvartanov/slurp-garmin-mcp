@@ -63,6 +63,7 @@ DESTRUCTIVE_TOOLS = frozenset(
         "update_jetlag_trip",
         "update_workout",
         "set_steps_goal",
+        "set_power_zones",
         "download_activity_file",
         "download_course_gpx",
         "download_workout",
@@ -90,7 +91,7 @@ DESTRUCTIVE_TOOLS = frozenset(
 IDEMPOTENT_TOOLS = frozenset(
     {"reschedule_workout", "schedule_week", "schedule_workout",
      "update_calendar_event", "update_workout",
-     "update_jetlag_trip", "set_steps_goal"}
+     "update_jetlag_trip", "set_steps_goal", "set_power_zones"}
 )
 
 
@@ -132,6 +133,11 @@ READ_ONLY_TOOLS = frozenset(
         "get_body_battery_events",
         "get_body_composition",
         "get_account_stats",
+        "get_activity_power_curve",
+        "get_one_rep_max_history",
+        "get_performance_history",
+        "get_performance_metric",
+        "get_training_zones",
         "get_calendar_event",
         "get_ecg",
         "get_ecg_recordings",

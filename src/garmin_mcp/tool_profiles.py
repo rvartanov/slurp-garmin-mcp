@@ -194,6 +194,13 @@ WORKOUTS_TOOLS = CORE_TOOLS | frozenset(
 
 TRAINING_TOOLS = CORE_TOOLS | frozenset(
     {
+        # metrics_extra
+        "get_performance_metric",
+        "get_performance_history",
+        "get_training_zones",
+        "set_power_zones",
+        "get_one_rep_max_history",
+        "get_activity_power_curve",
         # training
         "get_acclimation",
         "get_cycling_ftp",
