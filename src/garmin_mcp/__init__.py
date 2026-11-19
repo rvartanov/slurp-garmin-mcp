@@ -20,6 +20,7 @@ from garminconnect import Garmin, GarminConnectAuthenticationError, GarminConnec
 
 # Import all modules
 from garmin_mcp import token_utils
+from garmin_mcp import http_auth
 from garmin_mcp import activity_management
 from garmin_mcp import health_wellness
 from garmin_mcp import user_profile
@@ -768,6 +769,7 @@ The most used ones:
   GARMIN_MCP_HTTP_TOKEN      require 'Authorization: Bearer <token>' (or _FILE)
   GARMIN_MCP_URL_SECRET      serve MCP under /<secret>/mcp only (or _FILE)
   GARMIN_MCP_REQUIRE_AUTH    true: refuse to serve HTTP without a token/secret
+  GARMIN_MCP_ALLOWED_HOSTS   public host name(s) a proxy or tunnel forwards
   GARMIN_TOOL_PROFILE        built-in tool subset
   GARMIN_ENABLED_TOOLS / GARMIN_DISABLED_TOOLS   allow/deny lists
 
@@ -825,6 +827,9 @@ def main():
         enabled_tools, disabled_tools = _resolve_tool_filters()
         transport, http_host, http_port = _parse_transport_config()
         stateless_http = _resolve_stateless_http()
+        transport_security = (
+            None if transport == "stdio" else http_auth.resolve_transport_security()
+        )
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         sys.exit(1)
@@ -864,6 +869,7 @@ def main():
         host=http_host,
         port=http_port,
         stateless_http=stateless_http,
+        transport_security=transport_security,
     )
     app = _ToolFilter(fastmcp, enabled_tools, disabled_tools, profile_tools)
     if profile_tools is not None:
@@ -936,8 +942,6 @@ def main():
 
         # Optional shared secret (#339). Without it the endpoint is open, which
         # is fine on loopback and dangerous anywhere else.
-        from garmin_mcp import http_auth
-
         try:
             http_token = http_auth.resolve_http_token()
             url_secret = http_auth.resolve_url_secret()
@@ -965,6 +969,14 @@ def main():
             print(
                 "MCP endpoints are served under /<secret>/ only (GARMIN_MCP_URL_SECRET); "
                 "every other path is a 404, except /healthz and /readyz.",
+                file=sys.stderr,
+            )
+        if transport_security is not None:
+            print(
+                "Accepted Host headers (GARMIN_MCP_ALLOWED_HOSTS): "
+                + ", ".join(transport_security.allowed_hosts)
+                + "; Origins: "
+                + ", ".join(transport_security.allowed_origins),
                 file=sys.stderr,
             )
         if not (http_token or url_secret) and not http_auth.is_loopback(http_host):

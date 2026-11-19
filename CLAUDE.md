@@ -8,7 +8,7 @@ It is a fork of [Taxuspt/garmin_mcp](https://github.com/Taxuspt/garmin_mcp) (rem
 
 ### Fork-specific parts
 
-- `src/garmin_mcp/http_auth.py`: bearer token, URL-secret mode (`GARMIN_MCP_URL_SECRET`), `_FILE` variants, `GARMIN_MCP_REQUIRE_AUTH`. Never print or log a secret.
+- `src/garmin_mcp/http_auth.py`: bearer token, URL-secret mode (`GARMIN_MCP_URL_SECRET`), `_FILE` variants, `GARMIN_MCP_REQUIRE_AUTH`, Host/Origin allowlist (`GARMIN_MCP_ALLOWED_HOSTS`). Never print or log a secret.
 - `deploy/`: systemd units, `install.sh` / `uninstall.sh`, `env.example`, reverse proxy examples.
 - `Dockerfile`, `docker-compose.yml`: non-root HTTP service with required authentication.
 - `docs/`: user documentation. `docs/tools.md` is generated: run `uv run python scripts/generate_tools_doc.py` after adding, removing or re-describing a tool (CI checks it), and `uv run python scripts/generate_dxt_tools.py` for `dxt/manifest.json`.

@@ -10,6 +10,15 @@ All notable changes to Slurp garmin-mcp. The format follows
 
 - `get_calendar_events` returns `event_id`, Garmin's id for the calendar
   event, in preparation for tools that change and delete events.
+- `GARMIN_MCP_ALLOWED_HOSTS` and `GARMIN_MCP_ALLOWED_ORIGINS`: host names and
+  origins to accept next to loopback in the MCP SDK's DNS-rebinding check.
+
+### Fixed
+
+- Behind Tailscale Funnel, Caddy or nginx (the documented deployments) the
+  server answered every MCP request with `421 Invalid Host header`, because
+  the SDK only accepts a loopback `Host` on a loopback bind. The deployment
+  examples now set `GARMIN_MCP_ALLOWED_HOSTS`.
 
 ## [1.0.0] - 2026-11-18
 
