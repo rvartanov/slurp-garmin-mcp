@@ -12,6 +12,7 @@ import json
 import os
 import re
 from typing import Any, Optional
+from urllib.parse import quote
 
 from garmin_mcp.activity_analysis import _resolve_download_dir
 from garmin_mcp.health_extra import _date, _positive, _range
@@ -23,6 +24,11 @@ garmin_client = None
 
 _MAX_INLINE_BYTES = 5 * 1024 * 1024
 _ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+# Garmin's report ids are base64 text (letters, digits, + / =). garminconnect
+# 0.3.20 only accepts [A-Za-z0-9_-] and so refuses every real id; the two
+# report endpoints are therefore called directly with the id URL-encoded.
+_REPORT_ID_RE = re.compile(r"^[A-Za-z0-9+/=_-]{1,2048}$")
+_REPORT_URL = "/reportexport-service/export"
 _MIME = {".gpx": "application/gpx+xml", ".fit": "application/vnd.ant.fit",
          ".zip": "application/zip", ".pdf": "application/pdf"}
 
@@ -115,9 +121,10 @@ def register_tools(app):
         """Start a PDF report export in Garmin Connect (fetch it with download_report)
 
         Categories the web app uses: bloodPressure (options e.g.
-        {"reportSubCategory": "FOUR_WEEKS", "reportFormat": "PDF"}; sub
-        categories DAILY, SEVEN_DAYS, FOUR_WEEKS, YEARLY) and
-        wellnessactivity (options {"supplementalId": "<snapshot uuid>"}).
+        {"reportSubCategory": "FourWeeks", "reportFormat": "PDF",
+        "contentToSkip": []}; sub categories Daily, SevenDays, FourWeeks,
+        Yearly) and wellnessactivity (options {"supplementalId": "<snapshot
+        uuid>"}).
 
         Args:
             category: Report category key, e.g. bloodPressure
@@ -154,14 +161,22 @@ def register_tools(app):
                 instead of returning it base64-encoded
         """
         try:
-            if not _ID_RE.match(str(report_id or "")):
+            if not _REPORT_ID_RE.match(str(report_id or "")):
                 return "report_id must be the reportId from request_report"
-            status = garmin_client.get_report_status(report_id)
-            state = ((status or {}).get("progress") or {}).get("status") if isinstance(status, dict) else None
+            encoded = quote(str(report_id), safe="")
+            status = garmin_client.connectapi(f"{_REPORT_URL}/reportStatus/{encoded}")
+            if not isinstance(status, dict) or not isinstance(status.get("progress"), dict):
+                return f"Unexpected report status from Garmin: {str(status)[:300]}"
+            state = status["progress"].get("status")
+            if state in ("FAILED", "ERROR"):
+                return _dump({"status": "failed", "progress": status["progress"]})
             if state != "READY":
-                return _dump({"status": "not_ready", "report_id": report_id, "progress": status,
+                return _dump({"status": "not_ready", "progress": status["progress"],
                               "message": "Garmin is still building the report; try again shortly."})
-            return _deliver(garmin_client.download_report(report_id), f"report_{report_id}.pdf", save)
+            pdf = garmin_client.download(f"{_REPORT_URL}/reportContent/{encoded}")
+            if not isinstance(pdf, (bytes, bytearray)) or not bytes(pdf).startswith(b"%PDF"):
+                return "Garmin did not return a PDF for this report."
+            return _deliver(pdf, "report.pdf", save)
         except ValueError as e:
             return str(e)
         except Exception as e:
