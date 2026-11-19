@@ -168,6 +168,13 @@ WORKOUTS_TOOLS = CORE_TOOLS | frozenset(
         "schedule_week",
         # calendar_events
         "get_calendar_events",
+        # race_events
+        "get_calendar_event",
+        "get_upcoming_events",
+        "get_primary_event",
+        "update_calendar_event",
+        "delete_calendar_event",
+        "update_workout",
     }
 )
 

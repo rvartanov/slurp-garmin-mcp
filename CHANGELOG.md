@@ -12,6 +12,11 @@ All notable changes to Slurp garmin-mcp. The format follows
   event, in preparation for tools that change and delete events.
 - `GARMIN_MCP_ALLOWED_HOSTS` and `GARMIN_MCP_ALLOWED_ORIGINS`: host names and
   origins to accept next to loopback in the MCP SDK's DNS-rebinding check.
+- Race and calendar event tools (`race_events` module): `get_calendar_event`,
+  `get_upcoming_events`, `get_primary_event`, `update_calendar_event`
+  (merges changes into the full event, keeps its id), `delete_calendar_event`
+  (asks for confirmation first) and `update_workout` (replaces a workout in
+  place, keeping its id and schedules; upstream #523).
 
 ### Changed
 

@@ -41,6 +41,7 @@ MODULE_TITLES = {
     "courses": "Courses",
     "activity_analysis": "Activity analysis",
     "calendar_events": "Calendar",
+    "race_events": "Race events",
 }
 
 
