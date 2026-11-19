@@ -70,13 +70,25 @@ async def test_request_and_download_report(app, mock_garmin_client):
     assert result["report"]["reportId"] == "r1"
     mock_garmin_client.request_report.assert_called_once_with("bloodPressure", "2026-10-01", DAY,
                                                              {"reportSubCategory": "FOUR_WEEKS"}, "en-US")
-    mock_garmin_client.get_report_status.return_value = {"progress": {"status": "IN_PROGRESS"}}
-    assert json.loads(await _call(app, "download_report", {"report_id": "r1"}))["status"] == "not_ready"
-    mock_garmin_client.download_report.assert_not_called()
-    mock_garmin_client.get_report_status.return_value = {"progress": {"status": "READY"}}
-    mock_garmin_client.download_report.return_value = b"%PDF"
-    pdf = json.loads(await _call(app, "download_report", {"report_id": "r1"}))
+    rid = "eHBvcnQ+abc/def=="
+    mock_garmin_client.connectapi.return_value = {"progress": {"status": "IN_PROGRESS"}}
+    assert json.loads(await _call(app, "download_report", {"report_id": rid}))["status"] == "not_ready"
+    mock_garmin_client.connectapi.assert_called_with("/reportexport-service/export/reportStatus/eHBvcnQ%2Babc%2Fdef%3D%3D")
+    mock_garmin_client.download.assert_not_called()
+    mock_garmin_client.connectapi.return_value = {"progress": {"status": "READY"}}
+    mock_garmin_client.download.return_value = b"%PDF-1.7"
+    pdf = json.loads(await _call(app, "download_report", {"report_id": rid}))
     assert pdf["mime_type"] == "application/pdf"
+    mock_garmin_client.download.assert_called_once_with("/reportexport-service/export/reportContent/eHBvcnQ%2Babc%2Fdef%3D%3D")
+
+
+async def test_download_report_unexpected_responses(app, mock_garmin_client):
+    mock_garmin_client.connectapi.return_value = "html"
+    assert "Unexpected report status" in await _call(app, "download_report", {"report_id": "abc="})
+    mock_garmin_client.connectapi.return_value = {"progress": {"status": "READY"}}
+    mock_garmin_client.download.return_value = b"<html>"
+    assert "did not return a PDF" in await _call(app, "download_report", {"report_id": "abc="})
+    assert "reportId" in await _call(app, "download_report", {"report_id": "a b"})
 
 
 async def test_request_report_validation_and_error(app, mock_garmin_client):

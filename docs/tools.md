@@ -437,5 +437,5 @@ Module `garmin_mcp.downloads_extra`.
 |---|---|---|---|---|
 | `download_course_file` | write (destructive) |  |  | Download a course as a GPX or FIT file |
 | `download_health_snapshot_file` | write (destructive) |  |  | Download Health Snapshot data: a day's ZIP, or one session as a FIT file |
-| `download_report` | write (destructive) |  |  | Download a PDF report started with request_report, or report its progress while it is being built |
+| `download_report` | write (destructive) |  | yes | Download a PDF report started with request_report, or report its progress while it is being built |
 | `request_report` | write |  |  | Start a PDF report export in Garmin Connect (fetch it with download_report) |

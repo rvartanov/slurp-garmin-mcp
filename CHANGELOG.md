@@ -91,6 +91,10 @@ All notable changes to Slurp garmin-mcp. The format follows
   FIT), `request_report` and `download_report` (PDF). Files up to 5 MB come
   back base64-encoded so remote clients get them; `save=true` stores them
   in the server's download directory.
+- `download_report` works with Garmin's real report ids (base64 text with
+  `=`, `+`, `/`), which garminconnect 0.3.20 rejects; the report status and
+  content endpoints are called directly with the id URL-encoded. Report sub
+  categories are `Daily`, `SevenDays`, `FourWeeks` and `Yearly`.
 
 ### Changed
 
