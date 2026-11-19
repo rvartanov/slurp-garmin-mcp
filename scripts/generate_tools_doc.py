@@ -43,6 +43,7 @@ MODULE_TITLES = {
     "calendar_events": "Calendar",
     "race_events": "Race events",
     "health_extra": "Health (extended)",
+    "metrics_extra": "Performance metrics (extended)",
 }
 
 
