@@ -25,6 +25,8 @@ ADDITIVE_TOOLS = frozenset(
         "create_jetlag_trip",
         "create_calendar_note",
         "create_activity_from_json",
+        "copy_workout",
+        "create_gear",
         "upload_activity_file",
         "create_course_from_activity",
         "schedule_training_plan",
@@ -59,6 +61,9 @@ DESTRUCTIVE_TOOLS = frozenset(
         "delete_calendar_event",
         "delete_jetlag_trip",
         "delete_calendar_note",
+        "delete_weigh_in",
+        "delete_blood_pressure",
+        "delete_gear",
         "delete_training_plan",
         "delete_course",
         "delete_custom_food",
@@ -77,6 +82,10 @@ DESTRUCTIVE_TOOLS = frozenset(
         "set_course_favorite",
         "set_activity_favorite",
         "update_activity",
+        "update_blood_pressure_note",
+        "update_gear",
+        "set_gear_status",
+        "set_gear_default",
         "download_activity_file",
         "download_course_gpx",
         "download_workout",
@@ -106,7 +115,9 @@ IDEMPOTENT_TOOLS = frozenset(
      "update_calendar_event", "update_workout",
      "update_jetlag_trip", "set_steps_goal", "set_power_zones",
      "move_calendar_item", "update_calendar_note", "update_course",
-     "set_course_favorite", "set_activity_favorite", "update_activity"}
+     "set_course_favorite", "set_activity_favorite", "update_activity",
+     "update_blood_pressure_note", "update_gear", "set_gear_status",
+     "set_gear_default"}
 )
 
 
@@ -150,6 +161,11 @@ READ_ONLY_TOOLS = frozenset(
         "get_account_stats",
         "get_activity_power_curve",
         "find_activities",
+        "get_blood_pressure_data",
+        "get_gear_data",
+        "get_upcoming_workouts",
+        "get_weight_data",
+        "get_workout_library",
         "get_activity_aggregates",
         "get_activity_data",
         "get_activity_event_types",
