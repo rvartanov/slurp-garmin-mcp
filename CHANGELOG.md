@@ -22,6 +22,20 @@ All notable changes to Slurp garmin-mcp. The format follows
 
 ### Fixed
 
+Taken from open upstream pull requests (authorship kept, `cherry picked from` in each commit):
+
+- Recovery time right after a workout was reported as 0 h when Garmin kept a
+  stale `REACHED_ZERO` phrase (upstream #491, PR #495).
+- `get_energy_balance` no longer counts today's partial day in mean intake
+  (upstream #504, PR #505).
+- Activity analysis weights heart-rate drift, grade buckets, climb averages
+  and temperature summaries by recorded time instead of sample count, and
+  ends climbs at the first flat sample (upstream #493, #494, #498, #499,
+  #502; PRs #496, #497, #500, #501, #503).
+- `GARMIN_TZ`: write tools read dates and local times in the user's zone;
+  `set_blood_pressure` takes an optional timestamp. Without `GARMIN_TZ`,
+  times without an offset are read as UTC (upstream #422, PR #444).
+
 - Behind Tailscale Funnel, Caddy or nginx (the documented deployments) the
   server answered every MCP request with `421 Invalid Host header`, because
   the SDK only accepts a loopback `Host` on a loopback bind. The deployment
