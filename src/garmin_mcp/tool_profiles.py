@@ -41,6 +41,19 @@ MINIMAL_TOOLS = CORE_TOOLS | frozenset(
 
 HEALTH_TOOLS = CORE_TOOLS | frozenset(
     {
+        # health_extra
+        "get_health_stats",
+        "get_health_trend",
+        "get_health_day",
+        "get_account_stats",
+        "get_health_snapshot",
+        "get_ecg_recordings",
+        "get_ecg",
+        "get_jetlag_trips",
+        "create_jetlag_trip",
+        "update_jetlag_trip",
+        "delete_jetlag_trip",
+        "set_steps_goal",
         # health_wellness
         "get_all_day_events",
         "get_all_day_stress",

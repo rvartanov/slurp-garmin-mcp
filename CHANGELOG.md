@@ -19,6 +19,14 @@ All notable changes to Slurp garmin-mcp. The format follows
   place, keeping its id and schedules; upstream #523).
 - `create_race_event`: add a race or goal event to the Garmin calendar, with
   distance, local start time, goal time and note.
+- Extended health tools (`health_extra` module), covering 47 more
+  garminconnect methods. Read series are bundled: `get_health_stats`
+  (19 daily series over a date range), `get_health_trend` (weekly and
+  monthly totals), `get_health_day` (9 single-day details),
+  `get_account_stats` (lifetime totals, per-sport statistics, last sync,
+  nutrition status), plus `get_health_snapshot`, `get_ecg_recordings`,
+  `get_ecg` and `get_jetlag_trips`. Writes: `set_steps_goal`,
+  `create_jetlag_trip`, `update_jetlag_trip`, `delete_jetlag_trip`.
 
 ### Changed
 

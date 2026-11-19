@@ -204,7 +204,8 @@ def register_tools(app):
 
         Args:
             name: Event name, e.g. "Rotterdam Marathon"
-            date: Event date in YYYY-MM-DD format
+            date: Event date in YYYY-MM-DD format; Garmin accepts at most one
+                year ahead
             event_type: Garmin event type, e.g. running, trail_running, cycling,
                 triathlon, swimming (default running)
             distance_km: Race distance in kilometers
