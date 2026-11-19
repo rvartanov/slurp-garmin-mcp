@@ -161,3 +161,30 @@ with [clients.md](clients.md).
 
 Settings, secrets and Garmin tokens are kept in both cases. Changes per
 version are in [CHANGELOG.md](../CHANGELOG.md).
+
+### Automatic updates
+
+`deploy/auto-update.sh` follows `main`: every run it fetches the newest
+commit, deploys it only when all its CI check runs passed, restarts the
+service and waits for `/readyz`. When the service does not become ready it
+installs the previous commit again. The deployed commit is kept in
+`~/.local/state/slurp-garmin-mcp/deployed-commit`. For a user install:
+
+```bash
+cp deploy/auto-update.sh ~/.local/share/slurp-garmin-mcp/
+cp deploy/systemd/slurp-garmin-mcp-update.{service,timer} ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now slurp-garmin-mcp-update.timer
+journalctl --user -u slurp-garmin-mcp-update -f
+```
+
+Settings go in `~/.config/slurp-garmin-mcp/update.env` (`SERVICE`,
+`READY_URL`, `VENV`, `SRC`, ...; see the top of the script). The script
+installs from its own clean clone (`SRC`), never from a working copy.
+
+### Upstream changes
+
+The `Upstream watch` workflow checks Taxuspt/garmin_mcp every Monday. When
+the merge is clean and the unit and integration tests pass, it opens a
+pull request labelled `upstream-sync` and merges it; otherwise it keeps an
+issue with the unmerged commits and the files that conflict.

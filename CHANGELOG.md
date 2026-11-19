@@ -95,6 +95,12 @@ All notable changes to Slurp garmin-mcp. The format follows
   `=`, `+`, `/`), which garminconnect 0.3.20 rejects; the report status and
   content endpoints are called directly with the id URL-encoded. Report sub
   categories are `Daily`, `SevenDays`, `FourWeeks` and `Yearly`.
+- The upstream watch merges clean upstream changes whose tests pass through
+  a pull request (`scripts/merge_upstream.sh`); conflicts and failing tests
+  still go to the `upstream-sync` issue.
+- `deploy/auto-update.sh` with a systemd timer: deploys the newest commit on
+  `main` whose CI passed, restarts the service and rolls back when it does
+  not become ready.
 
 ### Changed
 

@@ -1,0 +1,12 @@
+# Every 15 minutes, check main for a new commit with green CI and deploy it.
+[Unit]
+Description=Check for Slurp garmin-mcp updates every 15 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+RandomizedDelaySec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target
