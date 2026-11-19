@@ -92,6 +92,10 @@
       "description": "Get total count of activities in the user's Garmin account"
     },
     {
+      "name": "create_activity_from_json",
+      "description": "Create a manual activity from a complete Garmin activity payload"
+    },
+    {
       "name": "create_calendar_note",
       "description": "Add a note to a day on the Garmin Connect calendar"
     },
@@ -192,6 +196,10 @@
       "description": "Download a workout as a FIT file"
     },
     {
+      "name": "find_activities",
+      "description": "Find activities: search with the web app's filters, favourites, the last one, or training load per activity"
+    },
+    {
       "name": "get_acclimation",
       "description": "Get heat and altitude acclimation status for a given date."
     },
@@ -214,6 +222,18 @@
     {
       "name": "get_activity",
       "description": "Get detailed information for a single activity."
+    },
+    {
+      "name": "get_activity_aggregates",
+      "description": "Get activity aggregates over a date range"
+    },
+    {
+      "name": "get_activity_data",
+      "description": "Get one part of an activity's data from Garmin Connect"
+    },
+    {
+      "name": "get_activity_event_types",
+      "description": "List the activity event types (race, training, recreation, ...) Garmin offers"
     },
     {
       "name": "get_activity_exercise_sets",
@@ -760,6 +780,10 @@
       "description": "Replace the exercise sets on a strength (or other rep-counting) activity."
     },
     {
+      "name": "set_activity_favorite",
+      "description": "Mark an activity as favourite, or remove the mark"
+    },
+    {
       "name": "set_activity_feel",
       "description": "Set how an activity felt ('How did you feel?')."
     },
@@ -812,6 +836,10 @@
       "description": "Remove multiple scheduled workouts from the Garmin Connect calendar"
     },
     {
+      "name": "update_activity",
+      "description": "Change several fields of an activity in one call (the web app's activity editor)"
+    },
+    {
       "name": "update_calendar_event",
       "description": "Change fields of an existing Garmin Connect calendar event in place"
     },
@@ -834,6 +862,10 @@
     {
       "name": "update_workout",
       "description": "Replace an existing workout in place, keeping its id and schedules"
+    },
+    {
+      "name": "upload_activity_file",
+      "description": "Upload a FIT, GPX or TCX activity file to Garmin Connect"
     },
     {
       "name": "upload_course",

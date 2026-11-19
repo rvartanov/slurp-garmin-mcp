@@ -24,6 +24,8 @@ ADDITIVE_TOOLS = frozenset(
         "create_race_event",
         "create_jetlag_trip",
         "create_calendar_note",
+        "create_activity_from_json",
+        "upload_activity_file",
         "create_course_from_activity",
         "schedule_training_plan",
         "create_run_interval_workout",
@@ -73,6 +75,8 @@ DESTRUCTIVE_TOOLS = frozenset(
         "update_calendar_note",
         "update_course",
         "set_course_favorite",
+        "set_activity_favorite",
+        "update_activity",
         "download_activity_file",
         "download_course_gpx",
         "download_workout",
@@ -102,7 +106,7 @@ IDEMPOTENT_TOOLS = frozenset(
      "update_calendar_event", "update_workout",
      "update_jetlag_trip", "set_steps_goal", "set_power_zones",
      "move_calendar_item", "update_calendar_note", "update_course",
-     "set_course_favorite"}
+     "set_course_favorite", "set_activity_favorite", "update_activity"}
 )
 
 
@@ -145,6 +149,10 @@ READ_ONLY_TOOLS = frozenset(
         "get_body_composition",
         "get_account_stats",
         "get_activity_power_curve",
+        "find_activities",
+        "get_activity_aggregates",
+        "get_activity_data",
+        "get_activity_event_types",
         "get_calendar_overview",
         "get_course_favorites",
         "get_pace_bands",

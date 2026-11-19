@@ -46,6 +46,16 @@ All notable changes to Slurp garmin-mcp. The format follows
   `move_calendar_item`, `create_calendar_note`, `update_calendar_note`,
   `delete_calendar_note`, `create_course_from_activity`, `update_course`,
   `get_course_favorites`, `set_course_favorite` and `get_pace_bands`.
+- Extended activity tools (`activities_extra` module), covering 25 more
+  garminconnect methods: `get_activity_data` (12 parts: details, laps,
+  rounds, workout steps, jumps, sub-second data, swim lengths, map,
+  polyline, photos, segments, previous/next), `find_activities` (search
+  with the web app's filters, favourites, last activity, training load per
+  activity), `get_activity_aggregates` (weekly totals, fastest splits,
+  available metrics), `get_activity_event_types`, `set_activity_favorite`,
+  `update_activity` (several fields at once), `create_activity_from_json`
+  and `upload_activity_file` (FIT/GPX/TCX as base64, optionally as an
+  import that is not forwarded to Strava).
 
 ### Changed
 
