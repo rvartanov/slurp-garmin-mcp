@@ -37,7 +37,7 @@ All notable changes to Slurp garmin-mcp. The format follows
   acclimation, Cycling Ability, Running Economy, Critical Swim Speed,
   stamina, Fitness Age, one-rep max, glucose, biometrics),
   `get_performance_history` (15 histories incl. FTP, readiness, power
-  curves), `get_training_zones`, `set_power_zones`,
+  curves for cycling and rowing), `get_training_zones`, `set_power_zones`,
   `get_one_rep_max_history` and `get_activity_power_curve`.
 
 ### Changed

@@ -71,7 +71,9 @@ _HISTORY: Dict[str, Callable[[str, str, str], Any]] = {
         e, max(1, math.ceil(((datetime.date.fromisoformat(e) - datetime.date.fromisoformat(s)).days + 1) / 7))),
     "glucose": lambda s, e, a: garmin_client.get_glucose_data_range(s, e),
     "power_curve_cycling": lambda s, e, a: garmin_client.get_power_curve(s, e, "cycling"),
-    "power_curve_running": lambda s, e, a: garmin_client.get_power_curve(s, e, "running"),
+    # Garmin's range power curve supports cycling and rowing only (400 otherwise);
+    # a running activity's curve is available through get_activity_power_curve.
+    "power_curve_rowing": lambda s, e, a: garmin_client.get_power_curve(s, e, "rowing"),
 }
 
 
@@ -113,8 +115,9 @@ def register_tools(app):
         heat_altitude_acclimation, spo2_acclimation, cycling_ability,
         running_economy, critical_swim_speed, biometrics (weight, body fat,
         lactate threshold per period), fitness_age, fitness_age_weekly,
-        glucose, power_curve_cycling, power_curve_running (best power per
-        duration over the range).
+        glucose, power_curve_cycling, power_curve_rowing (best power per
+        duration over the range; Garmin has no range curve for running, use
+        get_activity_power_curve for one run).
 
         Args:
             metric: Which metric, see the list above
