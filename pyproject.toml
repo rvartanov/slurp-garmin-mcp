@@ -7,7 +7,7 @@ name = "slurp-garmin-mcp"
 version = "1.0.0"
 description = "Slurp garmin-mcp: MCP server for Garmin Connect, installable as a package and as a service"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
 authors = [
@@ -20,15 +20,14 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
     "python-dotenv==1.2.2",
-    "garminconnect==0.3.2",
+    "garminconnect==0.3.20",
     "requests==2.33.0",
     # mcp 2.x renamed mcp.server.fastmcp -> mcp.server.mcpserver (FastMCP ->
     # MCPServer). Cap until the server is ported to the new API.

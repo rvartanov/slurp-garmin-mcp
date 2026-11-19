@@ -1,6 +1,6 @@
 # Installation
 
-Slurp garmin-mcp is a Python package (3.10 or newer). Installing it gives you
+Slurp garmin-mcp is a Python package (3.12 or newer). Installing it gives you
 these commands:
 
 | Command | What it does |

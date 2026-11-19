@@ -13,6 +13,13 @@ All notable changes to Slurp garmin-mcp. The format follows
 - `GARMIN_MCP_ALLOWED_HOSTS` and `GARMIN_MCP_ALLOWED_ORIGINS`: host names and
   origins to accept next to loopback in the MCP SDK's DNS-rebinding check.
 
+### Changed
+
+- garminconnect 0.3.2 → 0.3.20. Fixes Garmin Connect China login (upstream
+  #257, #345) and makes about 200 more library methods available for new
+  tools. Requires Python 3.12 or newer; CI tests 3.12, 3.13 and 3.14. The
+  token file format is unchanged, so existing logins keep working.
+
 ### Fixed
 
 - Behind Tailscale Funnel, Caddy or nginx (the documented deployments) the
