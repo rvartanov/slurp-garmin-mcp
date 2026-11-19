@@ -158,3 +158,15 @@ async def test_gear_status_default_delete(app, mock_garmin_client):
 async def test_write_error(app, mock_garmin_client):
     mock_garmin_client.set_gear_status.side_effect = GarminConnectConnectionError("API Error 404 - gone")
     assert json.loads(await _call(app, "set_gear_status", {"gear_uuid": UUID, "status": "ACTIVE"}))["upstream_status"] == 404
+
+
+async def test_upcoming_workouts_are_summarised(app, mock_garmin_client):
+    entry = {"workoutScheduleId": 3, "calendarDate": "2026-11-20", "ownerId": 1,
+             "workout": {"workoutId": 9, "workoutName": "Tempo", "sportType": {"sportTypeKey": "running"},
+                         "estimatedDurationInSecs": 3600, "workoutSegments": [{"steps": list(range(30))}]}}
+    mock_garmin_client.get_scheduled_workouts_by_period.return_value = [entry]
+    short = json.loads(await _call(app, "get_upcoming_workouts", {"start_date": START, "end_date": END}))
+    assert short == [{"workoutScheduleId": 3, "calendarDate": "2026-11-20",
+                      "workout": {"workoutId": 9, "workoutName": "Tempo", "estimatedDurationInSecs": 3600, "sport": "running"}}]
+    full = json.loads(await _call(app, "get_upcoming_workouts", {"start_date": START, "end_date": END, "detail": True}))
+    assert full[0]["workout"]["workoutSegments"]
