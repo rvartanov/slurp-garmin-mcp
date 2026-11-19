@@ -86,6 +86,11 @@ All notable changes to Slurp garmin-mcp. The format follows
   `detail=true` returns Garmin's full response. `get_device_data`,
   `get_profile_data`, `get_calendar_overview` and `get_pace_bands` gain
   `detail`.
+- Download tools (`downloads_extra` module): `download_course_file` (GPX
+  or FIT), `download_health_snapshot_file` (a day's ZIP or one session's
+  FIT), `request_report` and `download_report` (PDF). Files up to 5 MB come
+  back base64-encoded so remote clients get them; `save=true` stores them
+  in the server's download directory.
 
 ### Changed
 
