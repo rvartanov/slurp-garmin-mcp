@@ -39,6 +39,13 @@ All notable changes to Slurp garmin-mcp. The format follows
   `get_performance_history` (15 histories incl. FTP, readiness, power
   curves for cycling and rowing), `get_training_zones`, `set_power_zones`,
   `get_one_rep_max_history` and `get_activity_power_curve`.
+- Training plan, calendar and course tools (`training_extra` module),
+  covering 22 more garminconnect methods: `get_training_plans` (yours,
+  active, catalogue), `get_training_plan`, `schedule_training_plan`,
+  `delete_training_plan`, `get_calendar_overview` (week or year),
+  `move_calendar_item`, `create_calendar_note`, `update_calendar_note`,
+  `delete_calendar_note`, `create_course_from_activity`, `update_course`,
+  `get_course_favorites`, `set_course_favorite` and `get_pace_bands`.
 
 ### Changed
 
