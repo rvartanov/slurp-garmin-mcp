@@ -56,6 +56,10 @@ All notable changes to Slurp garmin-mcp. The format follows
   `update_activity` (several fields at once), `create_activity_from_json`
   and `upload_activity_file` (FIT/GPX/TCX as base64, optionally as an
   import that is not forwarded to Strava).
+- `find_activities` returns 23 key fields per activity unless `detail=true`
+  (a search of 20 activities went from ~127 KB). `get_activity_data`
+  explains Garmin's HTTP 500 for parts an activity does not have (workout
+  steps, sub-second data, swim lengths, rounds, jumps).
 
 ### Changed
 
