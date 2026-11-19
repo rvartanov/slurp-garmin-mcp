@@ -21,6 +21,7 @@ ADDITIVE_TOOLS = frozenset(
         "add_weigh_in_with_timestamps",
         "create_custom_food",
         "create_manual_activity",
+        "create_race_event",
         "create_run_interval_workout",
         "create_run_workout",
         "create_strength_workout",

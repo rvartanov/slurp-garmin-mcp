@@ -11,10 +11,10 @@ from garmin_mcp import race_events
 
 EVENT = {
     "id": 123,
-    "title": "Some Marathon",
+    "eventName": "Some Marathon",
     "date": "2027-04-11",
     "location": "Somewhere",
-    "isRace": True,
+    "race": True,
     "shareableEventUuid": "uuid-1",
     "eventCustomization": {
         "customGoal": {"value": 14400, "unit": "second", "unitType": "time"},
@@ -39,7 +39,7 @@ async def _call(app, name, args=None):
 async def test_get_calendar_event(app, mock_garmin_client):
     mock_garmin_client.get_calendar_event.return_value = EVENT
     text = await _call(app, "get_calendar_event", {"event_id": 123})
-    assert json.loads(text)["title"] == "Some Marathon"
+    assert json.loads(text)["eventName"] == "Some Marathon"
     mock_garmin_client.get_calendar_event.assert_called_once_with(123)
 
 
@@ -78,13 +78,13 @@ async def test_get_primary_event(app, mock_garmin_client):
 
 async def test_update_calendar_event_merges_nested_changes(app, mock_garmin_client):
     mock_garmin_client.get_calendar_event.return_value = EVENT
-    changes = {"title": "Renamed", "eventCustomization": {"customGoal": {"value": 12600}}}
+    changes = {"eventName": "Renamed", "eventCustomization": {"customGoal": {"value": 12600}}}
     text = await _call(app, "update_calendar_event", {"event_id": 123, "changes": json.dumps(changes)})
 
     assert json.loads(text)["status"] == "success"
     event_id, sent = mock_garmin_client.update_calendar_event.call_args.args
     assert event_id == 123
-    assert sent["title"] == "Renamed"
+    assert sent["eventName"] == "Renamed"
     assert sent["eventCustomization"]["customGoal"] == {"value": 12600, "unit": "second", "unitType": "time"}
     # Untouched fields stay as they were.
     assert sent["eventCustomization"]["isPrimaryEvent"] is False
@@ -121,7 +121,7 @@ async def test_delete_calendar_event_needs_confirmation(app, mock_garmin_client)
     mock_garmin_client.get_calendar_event.return_value = EVENT
     result = json.loads(await _call(app, "delete_calendar_event", {"event_id": 123}))
     assert result["status"] == "needs_confirmation"
-    assert result["event"]["title"] == "Some Marathon"
+    assert result["event"]["eventName"] == "Some Marathon"
     mock_garmin_client.delete_calendar_event.assert_not_called()
 
 
@@ -154,3 +154,49 @@ async def test_update_workout_error(app, mock_garmin_client):
     mock_garmin_client.update_workout.side_effect = GarminConnectConnectionError("API Error 500 - oops")
     result = json.loads(await _call(app, "update_workout", {"workout_id": 77, "workout": json.dumps(WORKOUT)}))
     assert result["upstream_status"] == 500
+
+
+async def test_create_race_event_builds_garmin_event(app, mock_garmin_client, monkeypatch):
+    monkeypatch.setenv("GARMIN_TZ", "Europe/Amsterdam")
+    mock_garmin_client.create_calendar_event.return_value = {"id": 999, "eventName": "Test Race"}
+    result = json.loads(await _call(app, "create_race_event", {
+        "name": " Test Race ", "date": "2027-06-01", "event_type": "trail_running",
+        "distance_km": 21.1, "start_time": "09:30", "goal_time_seconds": 7200,
+    }))
+    assert result["status"] == "success" and result["event_id"] == 999
+    sent = mock_garmin_client.create_calendar_event.call_args.args[0]
+    assert sent["eventName"] == "Test Race"
+    assert sent["eventType"] == "trail_running" and sent["race"] is True
+    assert sent["completionTarget"] == {"value": 21.1, "unit": "kilometer", "unitType": "distance"}
+    assert sent["eventTimeLocal"] == {"startTimeHhMm": "09:30", "timeZoneId": "Europe/Amsterdam"}
+    assert sent["eventCustomization"]["customGoal"] == {"value": 7200, "unit": "second", "unitType": "time"}
+    assert sent["eventCustomization"]["isPrimaryEvent"] is False
+
+
+async def test_create_race_event_minimal(app, mock_garmin_client):
+    mock_garmin_client.create_calendar_event.return_value = {"id": 1}
+    await _call(app, "create_race_event", {"name": "X", "date": "2027-01-02"})
+    sent = mock_garmin_client.create_calendar_event.call_args.args[0]
+    assert "completionTarget" not in sent and "eventTimeLocal" not in sent
+    assert "customGoal" not in sent["eventCustomization"]
+
+
+@pytest.mark.parametrize("args, message", [
+    ({"name": "", "date": "2027-01-02"}, "name"),
+    ({"name": "X", "date": "02-01-2027"}, "YYYY-MM-DD"),
+    ({"name": "X", "date": "2027-02-30"}, "no such day"),
+    ({"name": "X", "date": "2027-01-02", "start_time": "9:30"}, "HH:MM"),
+    ({"name": "X", "date": "2027-01-02", "start_time": "09:30", "time_zone": "Mars/Base"}, "time zone"),
+    ({"name": "X", "date": "2027-01-02", "distance_km": -5}, "distance_km"),
+    ({"name": "X", "date": "2027-01-02", "goal_time_seconds": 0}, "goal_time_seconds"),
+    ({"name": "X", "date": "2027-01-02", "event_type": "Trail Run"}, "event_type"),
+])
+async def test_create_race_event_rejects_bad_input(app, mock_garmin_client, args, message):
+    assert message in await _call(app, "create_race_event", args)
+    mock_garmin_client.create_calendar_event.assert_not_called()
+
+
+async def test_create_race_event_error(app, mock_garmin_client):
+    mock_garmin_client.create_calendar_event.side_effect = GarminConnectConnectionError("API Error 400 - bad")
+    result = json.loads(await _call(app, "create_race_event", {"name": "X", "date": "2027-01-02"}))
+    assert result["upstream_status"] == 400
