@@ -62,6 +62,48 @@ _ACTIVITY_DATA: Dict[str, Callable[[int], Any]] = {
     "adjacent": lambda a: garmin_client.get_adjacent_activities(a),
 }
 
+# Kinds that only exist for some activities; Garmin answers the others with
+# HTTP 500 instead of an empty result.
+_OPTIONAL_KINDS = {
+    "workout_steps": "it was not a structured workout",
+    "subsecond": "it has no sub-second data",
+    "swim": "it is not a lap-swimming activity",
+    "rounds": "it has no rounds",
+    "jumps": "it has no jump data",
+}
+
+# Fields kept per activity in list results unless detail=true; a full
+# summary has ~130 fields (owner profile images, per-zone times, ...).
+_SUMMARY_FIELDS = (
+    "activityId", "activityName", "startTimeLocal", "activityType", "eventType",
+    "distance", "duration", "movingDuration", "elevationGain", "averageSpeed",
+    "averageHR", "maxHR", "avgPower", "normPower", "calories",
+    "aerobicTrainingEffect", "anaerobicTrainingEffect", "trainingEffectLabel",
+    "activityTrainingLoad", "locationName", "favorite", "pr", "manualActivity",
+)
+
+
+def _summary(activity: Any) -> Any:
+    if not isinstance(activity, dict):
+        return activity
+    short = {key: activity[key] for key in _SUMMARY_FIELDS if key in activity}
+    for key in ("activityType", "eventType"):
+        if isinstance(short.get(key), dict):
+            short[key] = short[key].get("typeKey")
+    return short
+
+
+def _summaries(value: Any) -> Any:
+    """Shorten every activity in a list result (or {activityList: [...]})."""
+    if isinstance(value, list):
+        return [_summary(item) for item in value]
+    if isinstance(value, dict) and isinstance(value.get("activityList"), list):
+        return {**value, "activityList": [_summary(item) for item in value["activityList"]]}
+    if isinstance(value, dict) and "activityId" in value:
+        return _summary(value)
+    return value
+
+
 # Filters search_activities passes through, as the web app names them.
 _SEARCH_FILTERS = (
     "activityType", "activitySubType", "startDate", "endDate", "search", "favorite",
@@ -92,7 +134,14 @@ def register_tools(app):
         try:
             fetch = _choice(kind, _ACTIVITY_DATA, "kind")
             activity = _positive(activity_id, "activity_id")
-            return _result(fetch(activity), f"Activity {activity} has no {kind} data.", detail)
+            try:
+                data = fetch(activity)
+            except Exception as e:
+                reason = _OPTIONAL_KINDS.get(kind.strip().lower())
+                if reason and ("500" in str(e) or "server error" in str(e).lower()):
+                    return f"Activity {activity} has no {kind} data ({reason}; Garmin answered with a server error)."
+                raise
+            return _result(data, f"Activity {activity} has no {kind} data.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:
@@ -101,7 +150,8 @@ def register_tools(app):
     @app.tool()
     async def find_activities(kind: str = "search", filters: str = "",
                               start: int = 0, limit: int = 20,
-                              start_date: Optional[str] = None, end_date: Optional[str] = None) -> str:
+                              start_date: Optional[str] = None, end_date: Optional[str] = None,
+                              detail: bool = False) -> str:
         """Find activities: search with the web app's filters, favourites, the last one, or training load per activity
 
         kind:
@@ -121,6 +171,8 @@ def register_tools(app):
             limit: Number of results (default 20, at most 100)
             start_date: First day for kind=training_load, YYYY-MM-DD
             end_date: Last day for kind=training_load, YYYY-MM-DD
+            detail: true for Garmin's full activity summaries (~130 fields each);
+                by default each activity is shortened to its key fields
         """
         try:
             key = (kind or "").strip().lower()
@@ -142,7 +194,9 @@ def register_tools(app):
                 result = garmin_client.get_training_load_activities(first, last)
             else:
                 return "kind must be search, favorites, last or training_load"
-            return _result(result, "No activities found.", False)
+            if not detail and key in ("search", "favorites", "last"):
+                result = _summaries(result)
+            return _result(result, "No activities found.", detail)
         except ValueError as e:
             return str(e)
         except Exception as e:

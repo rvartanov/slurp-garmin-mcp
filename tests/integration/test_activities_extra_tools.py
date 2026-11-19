@@ -147,3 +147,27 @@ async def test_upload_activity_file(app, mock_garmin_client, as_import, method):
 async def test_upload_activity_file_rejects_bad_input(app, mock_garmin_client, filename, content, message):
     assert message in await _call(app, "upload_activity_file", {"filename": filename, "content_base64": content})
     mock_garmin_client.upload_activity.assert_not_called()
+
+
+async def test_optional_kind_server_error_is_explained(app, mock_garmin_client):
+    mock_garmin_client.get_activity_step_details.side_effect = Exception("Garmin Connect server error: API Error 500 - x")
+    text = await _call(app, "get_activity_data", {"activity_id": 77, "kind": "workout_steps"})
+    assert "not a structured workout" in text and not text.startswith("Error")
+
+
+async def test_server_error_on_core_kind_stays_an_error(app, mock_garmin_client):
+    mock_garmin_client.get_activity_laps.side_effect = Exception("API Error 500 - x")
+    assert (await _call(app, "get_activity_data", {"activity_id": 77, "kind": "laps"})).startswith("Error")
+
+
+async def test_find_activities_summarises_by_default(app, mock_garmin_client):
+    full = {"activityId": 1, "activityName": "Run", "activityType": {"typeKey": "running"},
+            "ownerProfileImageUrlLarge": "x", "hrTimeInZone_1": 5, "distance": 5000.0}
+    mock_garmin_client.search_activities.return_value = [full]
+    short = json.loads(await _call(app, "find_activities"))
+    assert short == [{"activityId": 1, "activityName": "Run", "activityType": "running", "distance": 5000.0}]
+    whole = json.loads(await _call(app, "find_activities", {"detail": True}))
+    assert whole == [full]
+    mock_garmin_client.get_favorite_activities.return_value = {"activityList": [full]}
+    fav = json.loads(await _call(app, "find_activities", {"kind": "favorites"}))
+    assert fav["activityList"][0]["activityType"] == "running"
