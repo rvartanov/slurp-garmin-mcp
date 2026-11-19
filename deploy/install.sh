@@ -26,8 +26,8 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 command -v systemctl >/dev/null || { echo "systemd is required." >&2; exit 1; }
-"$PYTHON" -c 'import sys; sys.exit(sys.version_info < (3, 10))' \
-    || { echo "Python 3.10 or newer is required (set PYTHON=...)." >&2; exit 1; }
+"$PYTHON" -c 'import sys; sys.exit(sys.version_info < (3, 12))' \
+    || { echo "Python 3.12 or newer is required (set PYTHON=...)." >&2; exit 1; }
 "$PYTHON" -c 'import venv, ensurepip' 2>/dev/null \
     || { echo "Python's venv module is missing (Debian/Ubuntu: apt install python3-venv)." >&2; exit 1; }
 case "$SOURCE" in

@@ -15,7 +15,7 @@ It runs locally next to a desktop client, or as a service on a server
 
 ## Quick start (local)
 
-Needs Python 3.10 or newer and [uv](https://docs.astral.sh/uv/).
+Needs Python 3.12 or newer and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 # 1. Log in to Garmin once (asks for your MFA code if enabled)

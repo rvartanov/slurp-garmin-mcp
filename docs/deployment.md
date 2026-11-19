@@ -15,7 +15,7 @@ Pick [systemd](#systemd) or [Docker](#docker) for steps 1 and 2, then
 
 ### System service (recommended)
 
-Needs root, Python 3.10 or newer with the `venv` module, and git.
+Needs root, Python 3.12 or newer with the `venv` module, and git.
 
 ```bash
 git clone https://github.com/rvartanov/slurp-garmin-mcp
