@@ -60,6 +60,14 @@ All notable changes to Slurp garmin-mcp. The format follows
   (a search of 20 activities went from ~127 KB). `get_activity_data`
   explains Garmin's HTTP 500 for parts an activity does not have (workout
   steps, sub-second data, swim lengths, rounds, jumps).
+- Workout library, body and gear tools (`equipment_extra` module), covering
+  33 more garminconnect methods: `get_workout_library`,
+  `get_upcoming_workouts`, `copy_workout`; `get_weight_data`,
+  `get_blood_pressure_data`, `delete_weigh_in`,
+  `update_blood_pressure_note`, `delete_blood_pressure`; `get_gear_data`
+  (gear v2: list, details, activities, types, catalogue search),
+  `create_gear`, `update_gear`, `set_gear_status`, `set_gear_default` and
+  `delete_gear`.
 
 ### Changed
 

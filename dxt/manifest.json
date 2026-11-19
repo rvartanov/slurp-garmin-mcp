@@ -88,6 +88,10 @@
       "description": "Add a new weight measurement with specific timestamps"
     },
     {
+      "name": "copy_workout",
+      "description": "Duplicate a workout in the library under a new name"
+    },
+    {
       "name": "count_activities",
       "description": "Get total count of activities in the user's Garmin account"
     },
@@ -106,6 +110,10 @@
     {
       "name": "create_custom_food",
       "description": "Create a custom food in the user's Garmin nutrition library"
+    },
+    {
+      "name": "create_gear",
+      "description": "Add a piece of gear (shoes, bike, ...) to Garmin Connect"
     },
     {
       "name": "create_jetlag_trip",
@@ -144,6 +152,10 @@
       "description": "Permanently delete an activity from Garmin Connect."
     },
     {
+      "name": "delete_blood_pressure",
+      "description": "Delete one blood pressure reading"
+    },
+    {
       "name": "delete_calendar_event",
       "description": "Delete a race or event from the Garmin Connect calendar"
     },
@@ -164,12 +176,20 @@
       "description": "Delete a food log entry"
     },
     {
+      "name": "delete_gear",
+      "description": "Delete a piece of gear (set_gear_status RETIRED keeps its history)"
+    },
+    {
       "name": "delete_jetlag_trip",
       "description": "Delete a Jet Lag Adviser trip"
     },
     {
       "name": "delete_training_plan",
       "description": "Remove a scheduled training plan and its workouts from your calendar"
+    },
+    {
+      "name": "delete_weigh_in",
+      "description": "Delete one weigh-in (delete_weigh_ins removes all of a day)"
     },
     {
       "name": "delete_weigh_ins",
@@ -308,6 +328,10 @@
       "description": "Get blood pressure data"
     },
     {
+      "name": "get_blood_pressure_data",
+      "description": "Get blood pressure readings from Garmin Connect"
+    },
+    {
       "name": "get_body_battery",
       "description": "Get body battery data with events"
     },
@@ -422,6 +446,10 @@
     {
       "name": "get_gear",
       "description": "Get all gear registered with the user account"
+    },
+    {
+      "name": "get_gear_data",
+      "description": "Get gear data from Garmin Connect (the web app's gear v2 endpoints)"
     },
     {
       "name": "get_goals",
@@ -680,6 +708,10 @@
       "description": "Get the upcoming races and goal events on the Garmin Connect calendar"
     },
     {
+      "name": "get_upcoming_workouts",
+      "description": "Get scheduled workouts: the next one, or all in a period (including adaptive plans)"
+    },
+    {
       "name": "get_user_profile",
       "description": "Get user profile information"
     },
@@ -712,8 +744,16 @@
       "description": "Get weight measurements between specified dates"
     },
     {
+      "name": "get_weight_data",
+      "description": "Get weight data from Garmin Connect"
+    },
+    {
       "name": "get_workout_by_id",
       "description": "Get detailed information for a specific workout"
+    },
+    {
+      "name": "get_workout_library",
+      "description": "Get information about the workout library"
     },
     {
       "name": "get_workouts",
@@ -808,6 +848,14 @@
       "description": "Set and persist the default directory for downloaded activity files."
     },
     {
+      "name": "set_gear_default",
+      "description": "Make gear the default for an activity type (new activities of that type get it), or remove that"
+    },
+    {
+      "name": "set_gear_status",
+      "description": "Retire a piece of gear, or make it active again"
+    },
+    {
       "name": "set_heart_rate_zones",
       "description": "Set an account-level heart-rate training-zone configuration for one sport."
     },
@@ -840,6 +888,10 @@
       "description": "Change several fields of an activity in one call (the web app's activity editor)"
     },
     {
+      "name": "update_blood_pressure_note",
+      "description": "Change the note of a blood pressure reading"
+    },
+    {
       "name": "update_calendar_event",
       "description": "Change fields of an existing Garmin Connect calendar event in place"
     },
@@ -854,6 +906,10 @@
     {
       "name": "update_custom_food",
       "description": "Update an existing custom food in the user's Garmin nutrition library"
+    },
+    {
+      "name": "update_gear",
+      "description": "Edit a piece of gear; only the given fields change"
     },
     {
       "name": "update_jetlag_trip",

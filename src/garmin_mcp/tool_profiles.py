@@ -41,6 +41,12 @@ MINIMAL_TOOLS = CORE_TOOLS | frozenset(
 
 HEALTH_TOOLS = CORE_TOOLS | frozenset(
     {
+        # equipment_extra (body)
+        "get_weight_data",
+        "get_blood_pressure_data",
+        "delete_weigh_in",
+        "update_blood_pressure_note",
+        "delete_blood_pressure",
         # health_extra
         "get_health_stats",
         "get_health_trend",
@@ -112,6 +118,13 @@ HEALTH_TOOLS = CORE_TOOLS | frozenset(
 
 ACTIVITIES_TOOLS = CORE_TOOLS | frozenset(
     {
+        # equipment_extra (gear)
+        "get_gear_data",
+        "create_gear",
+        "update_gear",
+        "set_gear_status",
+        "set_gear_default",
+        "delete_gear",
         # activities_extra
         "get_activity_data",
         "find_activities",
@@ -190,6 +203,10 @@ WORKOUTS_TOOLS = CORE_TOOLS | frozenset(
         "schedule_week",
         # calendar_events
         "get_calendar_events",
+        # equipment_extra (workouts)
+        "get_workout_library",
+        "get_upcoming_workouts",
+        "copy_workout",
         # training_extra
         "get_training_plans",
         "get_training_plan",

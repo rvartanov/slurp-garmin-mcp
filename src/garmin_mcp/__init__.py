@@ -43,6 +43,7 @@ from garmin_mcp import health_extra
 from garmin_mcp import metrics_extra
 from garmin_mcp import training_extra
 from garmin_mcp import activities_extra
+from garmin_mcp import equipment_extra
 from garmin_mcp.tool_annotations import annotations_for
 from garmin_mcp.tool_profiles import resolve_tool_profile
 from garmin_mcp.write_errors import _upstream
@@ -871,6 +872,7 @@ def main():
     metrics_extra.configure(garmin_client)
     training_extra.configure(garmin_client)
     activities_extra.configure(garmin_client)
+    equipment_extra.configure(garmin_client)
 
     # Create the MCP app, wrapped so the env-var filter can drop tools.
     # host/port only matter for the HTTP transports; stdio ignores them.
@@ -918,6 +920,7 @@ def main():
     app = metrics_extra.register_tools(app)
     app = training_extra.register_tools(app)
     app = activities_extra.register_tools(app)
+    app = equipment_extra.register_tools(app)
 
     # Register resources (workout templates)
     app = workout_templates.register_resources(app)
