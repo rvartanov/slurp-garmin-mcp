@@ -71,6 +71,16 @@ All notable changes to Slurp garmin-mcp. The format follows
 - `get_upcoming_workouts` lists each scheduled workout's name, sport,
   duration and distance unless `detail=true` (two weeks of a training
   plan went from ~350 KB).
+- Achievement, goal, device, profile, women's health and golf tools
+  (`account_extra` module), covering the remaining 52 garminconnect
+  methods: `get_achievements` (14 kinds: badges, challenges, personal-record
+  metadata), `get_wellness_goals`, `set_daily_goal`, `get_device_data`
+  (9 kinds incl. sensors, device messages, solar gain),
+  `update_device_settings`, `send_scheduled_workouts_to_devices`,
+  `set_primary_training_device`, `get_profile_data`, `update_user_settings`,
+  `get_menstrual_overview`, `log_menstrual_day`, `set_menstrual_periods`,
+  `confirm_menstrual_period`, `update_menstrual_settings` and
+  `get_golf_data`.
 
 ### Changed
 

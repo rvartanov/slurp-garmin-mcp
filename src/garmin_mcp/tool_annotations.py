@@ -26,6 +26,7 @@ ADDITIVE_TOOLS = frozenset(
         "create_calendar_note",
         "create_activity_from_json",
         "copy_workout",
+        "send_scheduled_workouts_to_devices",
         "create_gear",
         "upload_activity_file",
         "create_course_from_activity",
@@ -86,6 +87,14 @@ DESTRUCTIVE_TOOLS = frozenset(
         "update_gear",
         "set_gear_status",
         "set_gear_default",
+        "set_daily_goal",
+        "update_device_settings",
+        "set_primary_training_device",
+        "update_user_settings",
+        "log_menstrual_day",
+        "set_menstrual_periods",
+        "confirm_menstrual_period",
+        "update_menstrual_settings",
         "download_activity_file",
         "download_course_gpx",
         "download_workout",
@@ -117,7 +126,9 @@ IDEMPOTENT_TOOLS = frozenset(
      "move_calendar_item", "update_calendar_note", "update_course",
      "set_course_favorite", "set_activity_favorite", "update_activity",
      "update_blood_pressure_note", "update_gear", "set_gear_status",
-     "set_gear_default"}
+     "set_gear_default", "set_daily_goal", "update_device_settings",
+     "set_primary_training_device", "update_user_settings", "log_menstrual_day",
+     "update_menstrual_settings"}
 )
 
 
@@ -161,7 +172,13 @@ READ_ONLY_TOOLS = frozenset(
         "get_account_stats",
         "get_activity_power_curve",
         "find_activities",
+        "get_achievements",
         "get_blood_pressure_data",
+        "get_device_data",
+        "get_golf_data",
+        "get_menstrual_overview",
+        "get_profile_data",
+        "get_wellness_goals",
         "get_gear_data",
         "get_upcoming_workouts",
         "get_weight_data",

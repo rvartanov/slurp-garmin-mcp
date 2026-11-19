@@ -88,6 +88,10 @@
       "description": "Add a new weight measurement with specific timestamps"
     },
     {
+      "name": "confirm_menstrual_period",
+      "description": "Confirm a period start (or set up cycle tracking with the first confirmed period)"
+    },
+    {
       "name": "copy_workout",
       "description": "Duplicate a workout in the library under a new name"
     },
@@ -226,6 +230,10 @@
     {
       "name": "get_account_stats",
       "description": "Get account-wide Garmin Connect totals and status"
+    },
+    {
+      "name": "get_achievements",
+      "description": "Get badges, challenges and personal-record information from Garmin Connect"
     },
     {
       "name": "get_activities",
@@ -392,6 +400,10 @@
       "description": "Get alarms from all Garmin devices"
     },
     {
+      "name": "get_device_data",
+      "description": "Get device, sensor and device-message information from Garmin Connect"
+    },
+    {
       "name": "get_device_last_used",
       "description": "Get information about the last used Garmin device"
     },
@@ -454,6 +466,10 @@
     {
       "name": "get_goals",
       "description": "Get Garmin Connect goals (active, future, or past)."
+    },
+    {
+      "name": "get_golf_data",
+      "description": "Get golf data from Garmin Connect"
     },
     {
       "name": "get_health_day",
@@ -524,6 +540,10 @@
       "description": "Get menstrual data for a specific date"
     },
     {
+      "name": "get_menstrual_overview",
+      "description": "Get menstrual cycle information from Garmin Connect"
+    },
+    {
       "name": "get_morning_training_readiness",
       "description": "Get morning training readiness score"
     },
@@ -582,6 +602,10 @@
     {
       "name": "get_primary_training_device",
       "description": "Get information about the primary training device"
+    },
+    {
+      "name": "get_profile_data",
+      "description": "Get profile information from Garmin Connect"
     },
     {
       "name": "get_progress_summary_between_dates",
@@ -748,6 +772,10 @@
       "description": "Get weight data from Garmin Connect"
     },
     {
+      "name": "get_wellness_goals",
+      "description": "Get wellness goals from Garmin Connect"
+    },
+    {
       "name": "get_workout_by_id",
       "description": "Get detailed information for a specific workout"
     },
@@ -766,6 +794,10 @@
     {
       "name": "log_food",
       "description": "Quick-add a food entry with macro values to the nutrition log"
+    },
+    {
+      "name": "log_menstrual_day",
+      "description": "Write the menstrual log for one day (replaces that day's log)"
     },
     {
       "name": "move_calendar_item",
@@ -808,6 +840,10 @@
       "description": "Search Garmin's general food catalog (FatSecret + Garmin custom foods)"
     },
     {
+      "name": "send_scheduled_workouts_to_devices",
+      "description": "Send all scheduled workouts to your devices (they arrive at the next sync)"
+    },
+    {
       "name": "set_activity_description",
       "description": "Set or update the free-text description (notes) of an activity."
     },
@@ -844,6 +880,10 @@
       "description": "Mark a course as favourite, or remove the mark"
     },
     {
+      "name": "set_daily_goal",
+      "description": "Set a daily wellness goal (for the step goal use set_steps_goal)"
+    },
+    {
       "name": "set_fit_download_dir",
       "description": "Set and persist the default directory for downloaded activity files."
     },
@@ -860,6 +900,10 @@
       "description": "Set an account-level heart-rate training-zone configuration for one sport."
     },
     {
+      "name": "set_menstrual_periods",
+      "description": "Replace the confirmed period days between two dates on the cycle calendar"
+    },
+    {
       "name": "set_nutrition_daily_settings",
       "description": "Update daily nutrition goals (calorie target and macronutrient targets)."
     },
@@ -870,6 +914,10 @@
     {
       "name": "set_power_zones",
       "description": "Write power zones (and FTP) for one or more sports"
+    },
+    {
+      "name": "set_primary_training_device",
+      "description": "Choose which device Garmin uses as the primary training device for training metrics"
     },
     {
       "name": "set_steps_goal",
@@ -908,12 +956,24 @@
       "description": "Update an existing custom food in the user's Garmin nutrition library"
     },
     {
+      "name": "update_device_settings",
+      "description": "Change device settings (alarms, activity tracking, ...); only the given keys change"
+    },
+    {
       "name": "update_gear",
       "description": "Edit a piece of gear; only the given fields change"
     },
     {
       "name": "update_jetlag_trip",
       "description": "Replace a Jet Lag Adviser trip (dates and all flights)"
+    },
+    {
+      "name": "update_menstrual_settings",
+      "description": "Change menstrual cycle tracking settings (userMenstrualCycleSettings)"
+    },
+    {
+      "name": "update_user_settings",
+      "description": "Change Garmin Connect user settings (units, formats, sleep times, training days, ...)"
     },
     {
       "name": "update_workout",

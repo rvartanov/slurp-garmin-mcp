@@ -41,6 +41,14 @@ MINIMAL_TOOLS = CORE_TOOLS | frozenset(
 
 HEALTH_TOOLS = CORE_TOOLS | frozenset(
     {
+        # account_extra (women's health, goals)
+        "get_menstrual_overview",
+        "log_menstrual_day",
+        "set_menstrual_periods",
+        "confirm_menstrual_period",
+        "update_menstrual_settings",
+        "get_wellness_goals",
+        "set_daily_goal",
         # equipment_extra (body)
         "get_weight_data",
         "get_blood_pressure_data",
@@ -118,6 +126,8 @@ HEALTH_TOOLS = CORE_TOOLS | frozenset(
 
 ACTIVITIES_TOOLS = CORE_TOOLS | frozenset(
     {
+        # account_extra (golf)
+        "get_golf_data",
         # equipment_extra (gear)
         "get_gear_data",
         "create_gear",
@@ -203,6 +213,9 @@ WORKOUTS_TOOLS = CORE_TOOLS | frozenset(
         "schedule_week",
         # calendar_events
         "get_calendar_events",
+        # account_extra (devices)
+        "get_device_data",
+        "send_scheduled_workouts_to_devices",
         # equipment_extra (workouts)
         "get_workout_library",
         "get_upcoming_workouts",
@@ -235,6 +248,8 @@ WORKOUTS_TOOLS = CORE_TOOLS | frozenset(
 
 TRAINING_TOOLS = CORE_TOOLS | frozenset(
     {
+        # account_extra (achievements)
+        "get_achievements",
         # metrics_extra
         "get_performance_metric",
         "get_performance_history",
