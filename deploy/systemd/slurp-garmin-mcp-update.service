@@ -1,0 +1,12 @@
+# Updates a Slurp garmin-mcp user install to the newest green commit on main.
+# Install with the timer: see docs/deployment.md (Automatic updates).
+[Unit]
+Description=Update Slurp garmin-mcp to the newest green commit
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=-%h/.config/slurp-garmin-mcp/update.env
+ExecStart=%h/.local/share/slurp-garmin-mcp/auto-update.sh
