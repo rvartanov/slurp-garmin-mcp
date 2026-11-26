@@ -1085,7 +1085,7 @@ async def test_remove_gear_from_activity_tool(app_with_gear, mock_garmin_client)
     mock_garmin_client.remove_gear_from_activity.return_value = {}
     result = await app_with_gear.call_tool(
         "remove_gear_from_activity",
-        {"activity_id": 12345678901, "gear_uuid": "abc123"}
+        {"activity_id": 12345678901, "gear_uuid": "abc123", "confirm": True}
     )
     assert result is not None
     mock_garmin_client.remove_gear_from_activity.assert_called_once_with("abc123", 12345678901)
@@ -1102,7 +1102,7 @@ async def test_remove_gear_from_activity_missing_gear_is_unavailable(
 
     result = await app_with_gear.call_tool(
         "remove_gear_from_activity",
-        {"activity_id": 12345678901, "gear_uuid": "missing"},
+        {"activity_id": 12345678901, "gear_uuid": "missing", "confirm": True},
     )
 
     assert result[0][0].text == (

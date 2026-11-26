@@ -168,6 +168,10 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   Nothing in the server reads it. It is created owner-only in one step
   (it was created with the default umask and chmod-ed afterwards) and a
   symlink in its place is refused.
+- `unschedule_workout`, `unschedule_workouts` and `remove_gear_from_activity`
+  ask for confirmation like the delete tools: without `confirm=true` they
+  return a preview and change nothing. `delete_workouts` and
+  `unschedule_workouts` take at most 25 ids per call.
 
 ## [1.0.0] - 2026-11-18
 

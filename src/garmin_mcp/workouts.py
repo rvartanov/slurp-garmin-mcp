@@ -443,6 +443,41 @@ def _get_all_workouts(client: Any) -> List[Dict[str, Any]]:
     return workouts
 
 
+# Most ids one bulk delete or unschedule call may take.
+_MAX_BULK_IDS = 25
+
+
+def _too_many_ids(ids: list, field: str) -> Optional[str]:
+    """Error text when a bulk call names more than _MAX_BULK_IDS ids."""
+    if len(ids) > _MAX_BULK_IDS:
+        return json.dumps({
+            "status": "failed",
+            "total": len(ids),
+            "message": (
+                f"{field} may hold at most {_MAX_BULK_IDS} ids per call, got {len(ids)}; "
+                "nothing was changed. Split the list into smaller calls."
+            ),
+        }, indent=2)
+    return None
+
+
+def _scheduled_preview(client: Any, scheduled_workout_id: int) -> Dict[str, Any]:
+    """Build a compact preview of a calendar entry before unscheduling it."""
+    preview: Dict[str, Any] = {"scheduled_workout_id": scheduled_workout_id}
+    try:
+        entry = client.get_scheduled_workout_by_id(scheduled_workout_id)
+    except Exception:
+        entry = None
+    if isinstance(entry, dict) and entry:
+        workout = entry.get("workout") if isinstance(entry.get("workout"), dict) else {}
+        preview.update({
+            "date": entry.get("calendarDate"),
+            "workout_id": workout.get("workoutId"),
+            "workout_name": workout.get("workoutName"),
+        })
+    return {key: value for key, value in preview.items() if value is not None}
+
+
 def _workout_preview(client: Any, workout_id: int) -> Dict[str, Any]:
     """Build a compact preview of a workout before deleting it."""
     preview: Dict[str, Any] = {"workout_id": workout_id}
@@ -1236,9 +1271,13 @@ def register_tools(app):
         preview the workouts, then call again with confirm=true to delete them.
 
         Args:
-            workout_ids: List of workout IDs to delete (get IDs from get_workouts)
+            workout_ids: List of workout IDs to delete (get IDs from get_workouts),
+                at most 25 per call
             confirm: Must be true to actually delete. Default false returns a preview.
         """
+        too_many = _too_many_ids(workout_ids, "workout_ids")
+        if too_many:
+            return too_many
         previews = [_workout_preview(garmin_client, workout_id) for workout_id in workout_ids]
         if not confirm:
             return json.dumps(
@@ -1657,7 +1696,7 @@ def register_tools(app):
             }, indent=2)
 
     @app.tool()
-    async def unschedule_workout(scheduled_workout_id: int) -> str:
+    async def unschedule_workout(scheduled_workout_id: int, confirm: bool = False) -> str:
         """Remove a scheduled workout from the Garmin Connect calendar
 
         Deletes a calendar entry without deleting the underlying workout
@@ -1671,9 +1710,22 @@ def register_tools(app):
         If you just scheduled this workout, allow a moment before unscheduling
         so the id is available.
 
+        Call once with confirm=false (the default) to preview the calendar
+        entry, then again with confirm=true to remove it.
+
         Args:
             scheduled_workout_id: Calendar-entry id from get_scheduled_workouts
+            confirm: Must be true to actually unschedule. Default false returns a preview.
         """
+        if not confirm:
+            return json.dumps({
+                "status": "needs_confirmation",
+                "scheduled_workout": _scheduled_preview(garmin_client, scheduled_workout_id),
+                "message": (
+                    "This removes the entry from the Garmin Connect calendar (the workout "
+                    "stays in the library). Call again with confirm=true to proceed."
+                ),
+            }, indent=2)
         try:
             # Delegate to the high-level garminconnect method. Its client.delete
             # returns a dict ({}), not a Response, so we rely on exceptions to
@@ -1693,7 +1745,7 @@ def register_tools(app):
             }, indent=2)
 
     @app.tool()
-    async def unschedule_workouts(scheduled_workout_ids: list[int]) -> str:
+    async def unschedule_workouts(scheduled_workout_ids: list[int], confirm: bool = False) -> str:
         """Remove multiple scheduled workouts from the Garmin Connect calendar
 
         Deletes multiple calendar entries in a single call. The underlying
@@ -1702,9 +1754,29 @@ def register_tools(app):
         IMPORTANT: each id is a calendar-entry id (the "scheduled_workout_id"
         field from get_scheduled_workouts), not a workout id.
 
+        Call once with confirm=false (the default) to preview the entries,
+        then again with confirm=true to remove them.
+
         Args:
-            scheduled_workout_ids: List of calendar-entry ids from get_scheduled_workouts
+            scheduled_workout_ids: List of calendar-entry ids from get_scheduled_workouts,
+                at most 25 per call
+            confirm: Must be true to actually unschedule. Default false returns a preview.
         """
+        too_many = _too_many_ids(scheduled_workout_ids, "scheduled_workout_ids")
+        if too_many:
+            return too_many
+        if not confirm:
+            return json.dumps({
+                "status": "needs_confirmation",
+                "total": len(scheduled_workout_ids),
+                "scheduled_workouts": [
+                    _scheduled_preview(garmin_client, sid) for sid in scheduled_workout_ids
+                ],
+                "message": (
+                    "This removes these entries from the Garmin Connect calendar (the "
+                    "workouts stay in the library). Call again with confirm=true to proceed."
+                ),
+            }, indent=2)
         results = []
         for scheduled_workout_id in scheduled_workout_ids:
             try:
