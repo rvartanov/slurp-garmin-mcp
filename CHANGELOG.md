@@ -172,6 +172,9 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   ask for confirmation like the delete tools: without `confirm=true` they
   return a preview and change nothing. `delete_workouts` and
   `unschedule_workouts` take at most 25 ids per call.
+- The Docker instructions no longer make the URL secret world-readable
+  (`chmod 644`): it is owned by the container user (uid 10001) with mode
+  0400.
 
 ## [1.0.0] - 2026-11-18
 
