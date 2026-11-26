@@ -8,6 +8,9 @@ on:
     - cron: '0 9 * * 1'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
@@ -23,11 +26,11 @@ jobs:
       run: uv python install 3.13
 
     - name: Check for dependency vulnerabilities
+      # Audits exactly the locked versions (with hashes) that installs and
+      # deploy/auto-update.sh use; fails on any known vulnerability.
       run: |
-        uv sync
-        uv pip list
-        echo "Checking for known security vulnerabilities..."
-        # Note: Add pip-audit or safety scan here if desired
+        uv export --frozen --no-emit-project -o "$RUNNER_TEMP/requirements.txt"
+        uvx pip-audit@2.10.1 --strict --disable-pip --require-hashes -r "$RUNNER_TEMP/requirements.txt"
 
     - name: Verify lock file is up to date
       run: |

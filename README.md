@@ -51,13 +51,15 @@ sudo slurp-garmin-mcp/deploy/install.sh     # systemd service, prints the next s
 or with Docker:
 
 ```bash
-mkdir -p secrets && openssl rand -hex 32 > secrets/url_secret.txt && chmod 644 secrets/url_secret.txt
+mkdir -p secrets && (umask 077; openssl rand -hex 32 > secrets/url_secret.txt)
+sudo chown 10001:10001 secrets/url_secret.txt && sudo chmod 400 secrets/url_secret.txt   # readable by the container user only
 docker compose run --rm --entrypoint garmin-mcp-auth garmin-mcp
 docker compose up -d
 ```
 
 Put a reverse proxy or tunnel with TLS in front and add
-`https://<your host>/<secret>/mcp` as a custom connector in Claude. The full
+`https://<your host>/<secret>/mcp` as a custom connector in Claude (the secret:
+`sudo cat secrets/url_secret.txt`). The full
 steps are in [docs/deployment.md](docs/deployment.md).
 
 ## Things to ask

@@ -139,6 +139,49 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   the SDK only accepts a loopback `Host` on a loopback bind. The deployment
   examples now set `GARMIN_MCP_ALLOWED_HOSTS`.
 
+### Security
+
+- The upstream watch no longer merges anything: a clean, green upstream
+  merge is opened as a pull request that waits for review. Upstream code
+  runs in a job with a read-only token; a separate job pushes the branch and
+  opens the pull request. Its actions are pinned by commit SHA.
+- Locked dependencies: mcp 1.28.1 → 1.30.0, h11 0.14.0 → 0.16.0, httpcore
+  1.0.7 → 1.0.9 and certifi 2025.1.31 → 2026.11.20, for known
+  vulnerabilities in the older versions. The security workflow now runs
+  `pip-audit` against `uv.lock` and fails on a known vulnerability.
+- File tools stay inside the download directory. With
+  `GARMIN_FIT_DOWNLOAD_DIR` set, `download_activity_file`'s `output_dir`,
+  `download_course_gpx`'s `output_path`, `save=true` downloads,
+  `set_fit_download_dir` and `upload_course`'s `gpx_path` must resolve
+  (symlinks included) inside it. Over HTTP without it, the limit is
+  `<state dir>/downloads`, which is now also the default download directory
+  there, and `set_fit_download_dir` is not offered. Files are written
+  without following a symlink. stdio without `GARMIN_FIT_DOWNLOAD_DIR` is
+  unchanged.
+- Unpacking a downloaded FIT file (ZIP or gzip) stops at 25 MB, the upload
+  limit, so a crafted archive cannot exhaust the server's memory.
+- Dates and ids that the nutrition tools and `get_workout_by_id` put into
+  a Garmin API path are checked first (`YYYY-MM-DD`; letters, digits and
+  dashes), so a crafted argument cannot reach another endpoint.
+- The base64 copy of the Garmin tokens (`~/.garminconnect_base64`) is no
+  longer written by default: only when `GARMINTOKENS_BASE64` names a file.
+  Nothing in the server reads it. It is created owner-only in one step
+  (it was created with the default umask and chmod-ed afterwards) and a
+  symlink in its place is refused.
+- `unschedule_workout`, `unschedule_workouts` and `remove_gear_from_activity`
+  ask for confirmation like the delete tools: without `confirm=true` they
+  return a preview and change nothing. `delete_workouts` and
+  `unschedule_workouts` take at most 25 ids per call.
+- The Docker instructions no longer make the URL secret world-readable
+  (`chmod 644`): it is owned by the container user (uid 10001) with mode
+  0400.
+- The Desktop Extension no longer asks for the Garmin email and password;
+  it logs in with the tokens from `garmin-mcp-auth`, which its install
+  steps already require. The client and troubleshooting docs no longer put
+  the password in a client config or on a command line.
+- The nginx example sends that server's error log to `/dev/null`: nginx
+  quotes the request line, and with it the URL secret, in upstream errors.
+
 ## [1.0.0] - 2026-11-18
 
 First release as Slurp garmin-mcp, forked from

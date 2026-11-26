@@ -72,7 +72,7 @@ trap 'rm -f "$body"' EXIT
     echo "uv run pytest -q && uv run python scripts/generate_tools_doc.py && uv run python scripts/generate_dxt_tools.py"
     echo '```'
     echo
-    echo "Then open a pull request. This issue closes itself after the merge."
+    echo "Then open a pull request, or review the \`upstream-sync\` pull request the upstream watch opened when the merge was clean and green. Nothing is merged automatically; this issue closes itself after the merge."
 } >"$body"
 
 title="Upstream: ${count} unmerged commit(s) from ${UPSTREAM_REPO}"

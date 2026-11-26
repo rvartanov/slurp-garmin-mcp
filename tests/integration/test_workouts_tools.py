@@ -3212,7 +3212,7 @@ async def test_unschedule_workout_success(app_with_workouts, mock_garmin_client)
     scheduled_workout_id = 1677275789
     result = await app_with_workouts.call_tool(
         "unschedule_workout",
-        {"scheduled_workout_id": scheduled_workout_id}
+        {"scheduled_workout_id": scheduled_workout_id, "confirm": True}
     )
 
     assert result is not None
@@ -3232,7 +3232,7 @@ async def test_unschedule_workout_error(app_with_workouts, mock_garmin_client):
 
     result = await app_with_workouts.call_tool(
         "unschedule_workout",
-        {"scheduled_workout_id": 999}
+        {"scheduled_workout_id": 999, "confirm": True}
     )
 
     assert result is not None
@@ -3348,7 +3348,7 @@ async def test_unschedule_workouts_multiple(app_with_workouts, mock_garmin_clien
 
     result = await app_with_workouts.call_tool(
         "unschedule_workouts",
-        {"scheduled_workout_ids": [111, 222, 333]}
+        {"scheduled_workout_ids": [111, 222, 333], "confirm": True}
     )
 
     assert result is not None
@@ -3371,7 +3371,7 @@ async def test_unschedule_workouts_partial_failure(app_with_workouts, mock_garmi
 
     result = await app_with_workouts.call_tool(
         "unschedule_workouts",
-        {"scheduled_workout_ids": [111, 999]}
+        {"scheduled_workout_ids": [111, 999], "confirm": True}
     )
 
     assert result is not None

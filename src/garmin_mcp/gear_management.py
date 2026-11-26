@@ -259,15 +259,41 @@ def register_tools(app):
             return f"Error adding gear to activity: {str(e)}"
 
     @app.tool()
-    async def remove_gear_from_activity(activity_id: int, gear_uuid: str) -> str:
+    async def remove_gear_from_activity(activity_id: int, gear_uuid: str, confirm: bool = False) -> str:
         """Remove gear association from an activity
 
-        Unlinks a specific piece of gear from an activity.
+        Unlinks a specific piece of gear from an activity. Call once with
+        confirm=false (the default) to preview, then again with confirm=true
+        to unlink.
 
         Args:
             activity_id: ID of the activity
             gear_uuid: UUID of the gear to remove
+            confirm: Must be true to actually unlink. Default false returns a preview.
         """
+        if not confirm:
+            preview = {"activity_id": activity_id, "gear_uuid": gear_uuid}
+            try:
+                linked = garmin_client.get_activity_gear(activity_id)
+            except Exception:
+                linked = None
+            if isinstance(linked, list):
+                wanted = _normalize_gear_uuid(gear_uuid)
+                match = next((g for g in linked if isinstance(g, dict) and _normalize_gear_uuid(g.get("uuid")) == wanted), None)
+                preview["linked"] = match is not None
+                if match:
+                    preview["gear_name"] = match.get("displayName") or match.get("customMakeModel")
+            return json.dumps(
+                {
+                    "status": "needs_confirmation",
+                    "gear": {k: v for k, v in preview.items() if v is not None},
+                    "message": (
+                        "This unlinks the gear from the activity. Call again with "
+                        "confirm=true to proceed."
+                    ),
+                },
+                indent=2,
+            )
         try:
             garmin_client.remove_gear_from_activity(gear_uuid, activity_id)
 

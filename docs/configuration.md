@@ -14,7 +14,7 @@ need.
 | Variable | Default | Meaning |
 |---|---|---|
 | `GARMINTOKENS` | `~/.garminconnect` | Directory with the tokens saved by `garmin-mcp-auth`. `~` and `${HOME}` are expanded. |
-| `GARMINTOKENS_BASE64` | | The tokens as one base64 string, for platforms without a persistent disk. |
+| `GARMINTOKENS_BASE64` | | File for an optional base64 copy of the tokens, for other garminconnect-based tools. Written (mode 0600) by `garmin-mcp-auth` and after a password login only when set; the server never reads it. |
 | `GARMIN_EMAIL`, `GARMIN_EMAIL_FILE` | | Login email. Only needed for `garmin-mcp-auth`, or as a fallback for accounts without MFA. |
 | `GARMIN_PASSWORD`, `GARMIN_PASSWORD_FILE` | | Password, same use as the email. |
 | `GARMIN_IS_CN` | `false` | `true` for Garmin Connect China (garmin.cn). |
@@ -68,7 +68,7 @@ public names instead of switching the check off:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `GARMIN_FIT_DOWNLOAD_DIR` | | Directory for files saved by `download_activity_file`. When set, the first-run question is skipped. |
+| `GARMIN_FIT_DOWNLOAD_DIR` | over HTTP: `<state dir>/downloads` | Directory for files saved by `download_activity_file` and the other download tools. When set, the first-run question is skipped, and tools may only write and read (`upload_course`) files inside it. Over HTTP the default directory is the limit instead; see [tool-notes.md](tool-notes.md#activity-file-downloads). |
 | `GARMIN_FIT_CONFIG` | `~/.garminconnect_fit_config.json` | Where the chosen download directory is remembered. |
 
 ## Tool Filtering

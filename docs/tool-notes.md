@@ -13,13 +13,16 @@ Notes value returns `null`; all existing gear fields remain unchanged.
 Two tools let you download a raw activity file to disk:
 
 - **`download_activity_file(activity_id, format="fit", output_dir=None)`** — downloads the activity and saves it to the configured directory. `format` accepts `fit` (default), `gpx`, `tcx`, or `csv`.
-- **`set_fit_download_dir(path)`** — sets and persists the default download directory (written to the config file).
+- **`set_fit_download_dir(path)`** — sets and persists the default download directory (written to the config file). Only available over stdio; an HTTP server does not offer it.
 
 **Where files are saved (precedence):**
 
 1. `output_dir` argument — one-off override, not persisted.
 2. `GARMIN_FIT_DOWNLOAD_DIR` environment variable.
 3. Persisted config set via `set_fit_download_dir`.
+4. Over HTTP: the server's default directory, `downloads` under its state directory (`$STATE_DIRECTORY`, else `$XDG_STATE_HOME/slurp-garmin-mcp`, else `~/.local/state/slurp-garmin-mcp`).
+
+**Limits:** when `GARMIN_FIT_DOWNLOAD_DIR` is set, every path a tool writes (`output_dir`, `download_course_gpx`'s `output_path`, `save=true` downloads) or reads (`upload_course`'s `gpx_path`) must resolve, symlinks included, to that directory or below it; relative paths start there. Over HTTP without `GARMIN_FIT_DOWNLOAD_DIR` the same applies to the default directory above, and a directory saved earlier with `set_fit_download_dir` is only used when it lies inside it. Over stdio without `GARMIN_FIT_DOWNLOAD_DIR` paths are not restricted.
 
 **First-run behavior:** if no directory is configured, `download_activity_file` returns `status: "needs_setup"`. The assistant will ask where you want to save files (suggesting the current directory as default), call `set_fit_download_dir` to persist your choice, and then retry the download automatically.
 

@@ -16,6 +16,7 @@ import re
 import tempfile
 from typing import Any, Callable, Dict, Optional
 
+from garmin_mcp import local_files
 from garmin_mcp.health_extra import _choice, _compact, _positive, _range
 from garmin_mcp.race_events import _json_object
 from garmin_mcp.write_errors import WriteTracker
@@ -23,7 +24,7 @@ from garmin_mcp.write_errors import WriteTracker
 # The garmin_client will be set by the main file
 garmin_client = None
 
-_MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+_MAX_UPLOAD_BYTES = local_files.MAX_FILE_BYTES
 _UPLOAD_SUFFIXES = (".fit", ".gpx", ".tcx")
 _TYPE_KEY_RE = re.compile(r"^[a-z_]+$")
 # Fields update_activity refuses: they identify the activity or its owner.

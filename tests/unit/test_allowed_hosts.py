@@ -17,7 +17,7 @@ import garmin_mcp
 from garmin_mcp import http_auth
 
 SECRET = "c0ffee-url-secret-0123456789abcdef"
-PUBLIC = "luxor.example.ts.net"
+PUBLIC = "myhost.example.ts.net"
 
 INITIALIZE = {
     "jsonrpc": "2.0",
@@ -174,7 +174,7 @@ def test_allowlist_also_protects_a_non_loopback_bind(http_env, serve):
 
 @pytest.mark.parametrize(
     "value",
-    ["*", "https://luxor.example.ts.net", "luxor.example.ts.net/mcp", "a b", "host:abc"],
+    ["*", "https://myhost.example.ts.net", "myhost.example.ts.net/mcp", "a b", "host:abc"],
 )
 def test_unusable_hosts_are_a_startup_error(http_env, capsys, value):
     http_env.setenv("GARMIN_MCP_ALLOWED_HOSTS", value)

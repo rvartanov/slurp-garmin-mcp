@@ -8,7 +8,8 @@ import argparse
 import os
 import sys
 import getpass
-import base64
+
+from typing import Optional
 
 import requests
 from garminconnect import Garmin, GarminConnectAuthenticationError, GarminConnectConnectionError, GarminConnectTooManyRequestsError
@@ -18,6 +19,8 @@ from garmin_mcp.token_utils import (
     inspect_token_store,
     get_token_path,
     get_token_base64_path,
+    requested_token_base64_path,
+    write_token_base64,
     token_exists,
     validate_tokens,
     get_token_info,
@@ -110,12 +113,13 @@ def _verify_saved_tokens(token_path: str, is_cn: bool = False) -> tuple[bool, st
         sys.stderr = old_stderr
 
 
-def authenticate(token_path: str, token_base64_path: str, force_reauth: bool = False, is_cn: bool = False) -> bool:
+def authenticate(token_path: str, token_base64_path: Optional[str] = None, force_reauth: bool = False, is_cn: bool = False) -> bool:
     """Authenticate with Garmin Connect and save tokens.
 
     Args:
         token_path: Path to save token directory
-        token_base64_path: Path to save base64 token file
+        token_base64_path: Optional path for a base64 copy of the tokens
+            (None: no copy)
         force_reauth: Force re-authentication even if tokens exist
         is_cn: Use Garmin Connect China (garmin.cn) instead of international
 
@@ -125,7 +129,8 @@ def authenticate(token_path: str, token_base64_path: str, force_reauth: bool = F
     import io
 
     token_path = resolve_token_path(token_path)
-    token_base64_path = resolve_token_path(token_base64_path)
+    if token_base64_path:
+        token_base64_path = resolve_token_path(token_base64_path)
 
     # Check if tokens already exist and are valid
     if not force_reauth and token_exists(token_path):
@@ -178,23 +183,17 @@ def authenticate(token_path: str, token_base64_path: str, force_reauth: bool = F
 
         # The directory is the login source. An optional base64 export failure
         # must not skip verification or invalidate the saved directory tokens.
-        try:
-            token_json_path = os.path.join(token_path, "garmin_tokens.json")
-            with open(token_json_path, "r") as f:
-                token_data = f.read()
-            token_base64 = base64.b64encode(token_data.encode()).decode()
-            with open(token_base64_path, "w") as token_file:
-                # A permission failure must occur before secrets are written.
-                os.chmod(token_base64_path, 0o600)
-                token_file.write(token_base64)
-        except OSError as e:
-            print(
-                f"WARNING: OAuth tokens were saved to '{token_path}', but the optional "
-                f"base64 export to '{token_base64_path}' failed: {e}",
-                file=sys.stderr,
-            )
-        else:
-            print(f"✓ OAuth tokens (base64) saved to: {token_base64_path}")
+        if token_base64_path:
+            try:
+                write_token_base64(token_path, token_base64_path)
+            except OSError as e:
+                print(
+                    f"WARNING: OAuth tokens were saved to '{token_path}', but the optional "
+                    f"base64 export to '{token_base64_path}' failed: {e}",
+                    file=sys.stderr,
+                )
+            else:
+                print(f"✓ OAuth tokens (base64) saved to: {token_base64_path}")
 
         # Verify tokens work with an independent token-based login. The login
         # above runs with return_on_mfa=True, which skips profile loading, so a
@@ -351,7 +350,7 @@ def diagnose_tokens(token_path: str | None, is_cn: bool) -> bool:
     base64_state = "present" if os.path.exists(base64_path) else "missing"
     print(
         f"  Base64 copy          : {base64_path} ({base64_state}; written for other "
-        "garminconnect tools, the server does not read it)"
+        "garminconnect tools only when GARMINTOKENS_BASE64 is set, the server does not read it)"
     )
     region = "garmin.cn" if is_cn else "garmin.com"
     print(f"  Region               : {region} (GARMIN_IS_CN={os.getenv('GARMIN_IS_CN') or '(not set)'})")
@@ -441,7 +440,8 @@ Examples:
 
     # Get token paths
     token_path = args.token_path or get_token_path()
-    token_base64_path = get_token_base64_path()
+    # The base64 copy is written only when GARMINTOKENS_BASE64 asks for it.
+    token_base64_path = requested_token_base64_path()
 
     # Resolve is_cn: CLI flag takes priority, then env var, then default False
     if args.is_cn:

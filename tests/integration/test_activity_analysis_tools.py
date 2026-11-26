@@ -1933,8 +1933,11 @@ def test_resolve_download_dir_prefers_output_dir_arg(monkeypatch, tmp_path):
     monkeypatch.setenv("GARMIN_FIT_DOWNLOAD_DIR", str(tmp_path / "env"))
     monkeypatch.setenv("GARMIN_FIT_CONFIG", str(tmp_path / "fit_config.json"))
     activity_analysis._write_fit_config(str(tmp_path / "cfg"))
-    result = activity_analysis._resolve_download_dir(str(tmp_path / "arg"))
-    assert result == os.path.abspath(str(tmp_path / "arg"))
+    result = activity_analysis._resolve_download_dir(str(tmp_path / "env" / "arg"))
+    assert result == os.path.abspath(str(tmp_path / "env" / "arg"))
+    # With GARMIN_FIT_DOWNLOAD_DIR set, output_dir may not leave it.
+    with pytest.raises(ValueError):
+        activity_analysis._resolve_download_dir(str(tmp_path / "arg"))
 
 
 def test_resolve_download_dir_uses_env_var(monkeypatch, tmp_path):

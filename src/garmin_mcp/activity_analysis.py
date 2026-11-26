@@ -19,6 +19,7 @@ import os
 import zipfile
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from garmin_mcp import local_files
 from garmin_mcp.activity_management import sanitize_lap_distance
 
 try:
@@ -116,18 +117,29 @@ def _extract_fit_bytes(raw: bytes) -> bytes:
 
     Garmin's ORIGINAL format download returns a ZIP archive containing one or
     more .fit files. Handle that, plus fall back for gzip and raw FIT.
+    The unpacked file may be at most local_files.MAX_FILE_BYTES (the upload
+    limit), so a crafted archive cannot exhaust the server's memory.
     """
+    limit = local_files.MAX_FILE_BYTES
+    too_large = f"Unpacked FIT file is larger than {limit // (1024 * 1024)} MB"
     if raw[:2] == b'PK':
         with zipfile.ZipFile(io.BytesIO(raw)) as zf:
             fit_names = [n for n in zf.namelist() if n.lower().endswith('.fit')]
             if not fit_names:
                 raise ValueError("ZIP archive contains no .fit files")
-            return zf.read(fit_names[0])
+            if zf.getinfo(fit_names[0]).file_size > limit:
+                raise ValueError(too_large)
+            with zf.open(fit_names[0]) as member:
+                data = member.read(limit + 1)
+    elif raw[:2] == b'\x1f\x8b':
+        with gzip.GzipFile(fileobj=io.BytesIO(raw)) as gz:
+            data = gz.read(limit + 1)
+    else:
+        return raw
 
-    if raw[:2] == b'\x1f\x8b':
-        return gzip.decompress(raw)
-
-    return raw
+    if len(data) > limit:
+        raise ValueError(too_large)
+    return data
 
 
 def _json_safe_fit_value(value: Any) -> Any:
@@ -582,17 +594,25 @@ def _resolve_download_dir(output_dir: Optional[str]) -> Optional[str]:
     1. output_dir argument (one-off; not persisted)
     2. GARMIN_FIT_DOWNLOAD_DIR environment variable
     3. persisted config (download_dir)
+    4. on HTTP transports, the default directory under the state directory
     Returns an absolute path, or None when nothing is configured.
+
+    With GARMIN_FIT_DOWNLOAD_DIR set, or on an HTTP transport, the result
+    must lie inside the allowed root (see local_files): output_dir outside
+    it raises ValueError, a persisted directory outside it is ignored.
     """
+    root = local_files.allowed_root()
     if output_dir:
-        return os.path.abspath(os.path.expanduser(output_dir))
-    env_dir = os.getenv("GARMIN_FIT_DOWNLOAD_DIR")
-    if env_dir:
-        return os.path.abspath(os.path.expanduser(env_dir))
+        return local_files.check_dir(output_dir, "output_dir")
+    if os.getenv("GARMIN_FIT_DOWNLOAD_DIR"):
+        return root
     cfg_dir = _read_fit_config().get("download_dir")
     if cfg_dir:
-        return os.path.abspath(os.path.expanduser(cfg_dir))
-    return None
+        try:
+            return local_files.check_dir(cfg_dir, "download_dir")
+        except ValueError:
+            pass
+    return root
 
 
 def _safe_avg(values: list) -> Optional[float]:
@@ -2117,6 +2137,9 @@ def register_tools(app):
           1. output_dir argument (one-off; not persisted)
           2. GARMIN_FIT_DOWNLOAD_DIR environment variable
           3. persisted config (set via set_fit_download_dir)
+          4. on a remote (HTTP) server, its default download directory
+        With GARMIN_FIT_DOWNLOAD_DIR set, or on a remote server, output_dir
+        must be inside that download directory (relative paths start there).
         If none is configured, returns status "needs_setup" with a suggested
         default (the server's current working directory). In that case, ask the
         user where to save, call set_fit_download_dir(path), then call this tool
@@ -2160,7 +2183,6 @@ def register_tools(app):
                 }, indent=2)
 
             activity_id = int(activity_id)
-            os.makedirs(download_dir, exist_ok=True)
 
             data = garmin_client.download_activity(
                 activity_id, dl_fmt=format_map[fmt]
@@ -2187,9 +2209,7 @@ def register_tools(app):
             else:
                 payload = raw
 
-            file_path = os.path.join(download_dir, f"{activity_id}.{fmt}")
-            with open(file_path, "wb") as f:
-                f.write(payload)
+            file_path = local_files.write_file(download_dir, f"{activity_id}.{fmt}", payload)
 
             return json.dumps({
                 "activity_id": activity_id,
@@ -2202,6 +2222,10 @@ def register_tools(app):
         except Exception as e:
             return f"Error downloading activity {activity_id}: {str(e)}"
 
+    # A remote client must not choose where the server writes files.
+    if local_files.http_transport():
+        return app
+
     @app.tool()
     async def set_fit_download_dir(path: str) -> str:
         """Set and persist the default directory for downloaded activity files.
@@ -2213,10 +2237,11 @@ def register_tools(app):
         Args:
             path: Directory where activity files (.fit/.gpx/.tcx/.csv) are saved.
                   Pass the current working directory to keep files where the
-                  server runs.
+                  server runs. With GARMIN_FIT_DOWNLOAD_DIR set it must be
+                  inside that directory.
         """
         try:
-            abspath = os.path.abspath(os.path.expanduser(path))
+            abspath = local_files.check_dir(path, "path")
             os.makedirs(abspath, exist_ok=True)
             _write_fit_config(abspath)
             return json.dumps({

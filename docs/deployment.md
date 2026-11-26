@@ -97,8 +97,11 @@ With Docker Compose, from a clone of the repository:
 
 ```bash
 mkdir -p secrets
-openssl rand -hex 32 > secrets/url_secret.txt
-chmod 644 secrets/url_secret.txt     # the container user must be able to read it
+(umask 077; openssl rand -hex 32 > secrets/url_secret.txt)
+# Owner-only, owned by the container user (uid 10001 in the Dockerfile), which
+# reads it through the bind-mounted Compose secret. Read it yourself with sudo.
+sudo chown 10001:10001 secrets/url_secret.txt
+sudo chmod 400 secrets/url_secret.txt
 
 # Log in to Garmin once (asks for the MFA code if enabled)
 docker compose run --rm --entrypoint garmin-mcp-auth garmin-mcp
@@ -120,7 +123,7 @@ docker run --rm -it -v garmin-tokens:/data --entrypoint garmin-mcp-auth slurp-ga
 
 docker run -d --name slurp-garmin-mcp --restart unless-stopped \
   -p 127.0.0.1:8000:8000 -v garmin-tokens:/data \
-  -e GARMIN_MCP_URL_SECRET="$(cat secrets/url_secret.txt)" \
+  -e GARMIN_MCP_URL_SECRET="$(sudo cat secrets/url_secret.txt)" \
   slurp-garmin-mcp
 ```
 
@@ -201,5 +204,8 @@ installs from its own clean clone (`SRC`), never from a working copy.
 
 The `Upstream watch` workflow checks Taxuspt/garmin_mcp every Monday. When
 the merge is clean and the unit and integration tests pass, it opens a
-pull request labelled `upstream-sync` and merges it; otherwise it keeps an
-issue with the unmerged commits and the files that conflict.
+pull request labelled `upstream-sync` and leaves it for review; it never
+merges. Upstream code runs only in a job with a read-only token. Otherwise it
+keeps an issue with the unmerged commits and the files that conflict.
+Because automatic updates deploy every green commit on `main`, review an
+upstream pull request before merging it.
