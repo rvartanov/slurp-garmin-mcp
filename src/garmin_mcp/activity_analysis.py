@@ -117,18 +117,29 @@ def _extract_fit_bytes(raw: bytes) -> bytes:
 
     Garmin's ORIGINAL format download returns a ZIP archive containing one or
     more .fit files. Handle that, plus fall back for gzip and raw FIT.
+    The unpacked file may be at most local_files.MAX_FILE_BYTES (the upload
+    limit), so a crafted archive cannot exhaust the server's memory.
     """
+    limit = local_files.MAX_FILE_BYTES
+    too_large = f"Unpacked FIT file is larger than {limit // (1024 * 1024)} MB"
     if raw[:2] == b'PK':
         with zipfile.ZipFile(io.BytesIO(raw)) as zf:
             fit_names = [n for n in zf.namelist() if n.lower().endswith('.fit')]
             if not fit_names:
                 raise ValueError("ZIP archive contains no .fit files")
-            return zf.read(fit_names[0])
+            if zf.getinfo(fit_names[0]).file_size > limit:
+                raise ValueError(too_large)
+            with zf.open(fit_names[0]) as member:
+                data = member.read(limit + 1)
+    elif raw[:2] == b'\x1f\x8b':
+        with gzip.GzipFile(fileobj=io.BytesIO(raw)) as gz:
+            data = gz.read(limit + 1)
+    else:
+        return raw
 
-    if raw[:2] == b'\x1f\x8b':
-        return gzip.decompress(raw)
-
-    return raw
+    if len(data) > limit:
+        raise ValueError(too_large)
+    return data
 
 
 def _json_safe_fit_value(value: Any) -> Any:

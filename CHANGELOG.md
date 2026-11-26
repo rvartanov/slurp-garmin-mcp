@@ -158,6 +158,8 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   there, and `set_fit_download_dir` is not offered. Files are written
   without following a symlink. stdio without `GARMIN_FIT_DOWNLOAD_DIR` is
   unchanged.
+- Unpacking a downloaded FIT file (ZIP or gzip) stops at 25 MB, the upload
+  limit, so a crafted archive cannot exhaust the server's memory.
 
 ## [1.0.0] - 2026-11-18
 

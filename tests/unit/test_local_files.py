@@ -193,3 +193,18 @@ async def test_deliver_save_on_http_uses_default_dir(monkeypatch, tmp_path):
     data = json.loads(downloads_extra._deliver(b"FIT", "course_9.fit", save=True))
     expected = tmp_path / "state" / "slurp-garmin-mcp" / "downloads" / "course_9.fit"
     assert data["saved_to"] == str(expected) and expected.read_bytes() == b"FIT"
+
+
+# --- unpacking downloads ----------------------------------------------------
+
+def test_extract_fit_bytes_caps_zip_and_gzip(monkeypatch):
+    import gzip
+
+    monkeypatch.setattr(local_files, "MAX_FILE_BYTES", 100)
+    assert activity_analysis._extract_fit_bytes(_fit_zip(b"x" * 100)) == b"x" * 100
+    assert activity_analysis._extract_fit_bytes(gzip.compress(b"x" * 100)) == b"x" * 100
+    with pytest.raises(ValueError, match="larger than"):
+        activity_analysis._extract_fit_bytes(_fit_zip(b"x" * 101))
+    with pytest.raises(ValueError, match="larger than"):
+        activity_analysis._extract_fit_bytes(gzip.compress(b"x" * 101))
+
