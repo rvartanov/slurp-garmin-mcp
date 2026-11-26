@@ -101,6 +101,10 @@ All notable changes to Slurp garmin-mcp. The format follows
 - `deploy/auto-update.sh` with a systemd timer: deploys the newest commit on
   `main` whose CI passed, restarts the service and rolls back when it does
   not become ready.
+- Release workflow: pushing a tag `v<version>` publishes the Docker image to
+  `ghcr.io/rvartanov/slurp-garmin-mcp` (tags `<version>` and `latest`) and
+  creates a GitHub release with that version's changelog section
+  (upstream #337, #136).
 
 ### Changed
 
