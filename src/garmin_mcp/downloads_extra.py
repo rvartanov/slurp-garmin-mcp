@@ -4,8 +4,9 @@ ZIP/FIT files and PDF report exports.
 
 Files come back base64-encoded in the result by default, so remote clients
 (claude.ai connectors) receive them; save=true writes them to the server's
-download directory instead (GARMIN_FIT_DOWNLOAD_DIR or set_fit_download_dir),
-like download_activity_file. Fork-specific module.
+download directory instead (GARMIN_FIT_DOWNLOAD_DIR or set_fit_download_dir,
+on HTTP the default directory under the state directory), like
+download_activity_file. Fork-specific module.
 """
 import base64
 import json
@@ -14,6 +15,7 @@ import re
 from typing import Any, Optional
 from urllib.parse import quote
 
+from garmin_mcp import local_files
 from garmin_mcp.activity_analysis import _resolve_download_dir
 from garmin_mcp.health_extra import _date, _positive, _range
 from garmin_mcp.race_events import _json_object
@@ -55,10 +57,7 @@ def _deliver(data: Any, filename: str, save: bool) -> str:
         if not directory:
             return ("No download directory is configured; set GARMIN_FIT_DOWNLOAD_DIR or call "
                     "set_fit_download_dir, or call again without save to get the file inline.")
-        os.makedirs(directory, exist_ok=True)
-        path = os.path.join(directory, filename)
-        with open(path, "wb") as out:
-            out.write(data)
+        path = local_files.write_file(directory, filename, bytes(data))
         return _dump({"status": "success", "saved_to": path, "bytes": len(data)})
     if len(data) > _MAX_INLINE_BYTES:
         return (f"{filename} is {len(data) // 1024} KB, more than the 5 MB that is returned inline; "

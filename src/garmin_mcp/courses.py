@@ -11,11 +11,11 @@ import io
 import json
 import math
 import os
-import pathlib
 import sys
 from typing import Any, Dict, Optional
 from xml.sax.saxutils import escape
 
+from garmin_mcp import local_files
 from garmin_mcp.activity_analysis import _resolve_download_dir
 
 # The garmin_client will be set by the main file
@@ -147,16 +147,20 @@ def _resolve_gpx_output_path(course_id: int, output_path: Optional[str] = None) 
     in .gpx so the tool cannot overwrite arbitrary files. Without output_path,
     use the same directory as download_activity_file (GARMIN_FIT_DOWNLOAD_DIR,
     then the one saved by set_fit_download_dir), falling back to ./courses.
+    With GARMIN_FIT_DOWNLOAD_DIR set, or on an HTTP transport, the file must
+    land inside the download directory (see local_files).
     """
     if output_path:
-        p = os.path.abspath(os.path.expanduser(output_path))
+        root = local_files.allowed_root()
+        p = os.path.abspath(os.path.join(root or "", os.path.expanduser(output_path)))
         if os.path.isdir(p) or output_path.endswith("/") or output_path.endswith("\\"):
-            return os.path.join(p, f"{course_id}.gpx")
+            return os.path.join(local_files.check_dir(p, "output_path"), f"{course_id}.gpx")
         if not p.lower().endswith(".gpx"):
             raise ValueError(
                 f"output_path must be a directory or a .gpx file, got: {output_path}"
             )
-        return p
+        directory = local_files.check_dir(os.path.dirname(p), "output_path")
+        return os.path.join(directory, os.path.basename(p))
 
     base_dir = _resolve_download_dir(None) or os.path.abspath("./courses")
     return os.path.join(base_dir, f"{course_id}.gpx")
@@ -294,7 +298,9 @@ def register_tools(app):
             course_id: ID of the course to download.
             output_path: Optional destination directory (saved as {course_id}.gpx)
                 or file path ending in .gpx; any other file path is rejected.
-                Defaults to the download_activity_file directory
+                With GARMIN_FIT_DOWNLOAD_DIR set, or on a remote server, it
+                must be inside the download directory (relative paths start
+                there). Defaults to the download_activity_file directory
                 (GARMIN_FIT_DOWNLOAD_DIR, then set_fit_download_dir), else
                 ./courses/{course_id}.gpx.
         """
@@ -304,8 +310,6 @@ def register_tools(app):
             data = garmin_client.client.connectapi(f"/course-service/course/{course_id}")
             if not isinstance(data, dict) or not data.get("geoPoints"):
                 return f"Error: course {course_id} not found or missing geoPoints."
-
-            os.makedirs(os.path.dirname(target_path), exist_ok=True)
 
             name = data.get("courseName") or f"Garmin Course {course_id}"
             geo_points = data.get("geoPoints") or []
@@ -342,8 +346,11 @@ def register_tools(app):
             lines.append("  </trk>")
             lines.append("</gpx>")
 
-            with open(target_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(lines))
+            local_files.write_file(
+                os.path.dirname(target_path),
+                os.path.basename(target_path),
+                "\n".join(lines).encode("utf-8"),
+            )
 
             return json.dumps(
                 {
@@ -372,7 +379,9 @@ def register_tools(app):
         and used as a navigation course or to build a PacePro strategy.
 
         Args:
-            gpx_path: Absolute path to the .gpx file on disk.
+            gpx_path: Absolute path to the .gpx file on disk. With
+                GARMIN_FIT_DOWNLOAD_DIR set, or on a remote server, it must be
+                inside the download directory (symlinks are resolved first).
             course_name: Override the course name. Defaults to the name parsed
                 from the GPX file. Max 128 characters; Garmin rejects longer.
             activity_type: One of running, cycling, hiking, walking, trail_running,
@@ -381,12 +390,12 @@ def register_tools(app):
                 Max 512 characters; Garmin rejects longer.
         """
         try:
-            _p = pathlib.Path(gpx_path)
-            if _p.suffix.lower() != ".gpx":
-                return f"Error: only .gpx files are allowed, got: {_p.suffix or '(no extension)'}"
-            gpx_path = str(_p.resolve())
-            if not os.path.isfile(gpx_path):
-                return f"Error: GPX file not found: {gpx_path}"
+            try:
+                gpx_path = local_files.check_input_file(gpx_path, ".gpx")
+            except FileNotFoundError:
+                return f"Error: GPX file not found: {os.path.abspath(os.path.expanduser(gpx_path))}"
+            except ValueError as e:
+                return f"Error: {e}"
 
             activity_type_id = _ACTIVITY_TYPE_IDS.get(activity_type.lower())
             if activity_type_id is None:
@@ -395,8 +404,7 @@ def register_tools(app):
                     f"Supported: {', '.join(sorted(_ACTIVITY_TYPE_IDS))}."
                 )
 
-            with open(gpx_path, "rb") as f:
-                gpx_bytes = f.read()
+            gpx_bytes = local_files.read_file(gpx_path)
 
             # Step 1: parse the GPX server-side
             parsed = garmin_client.client.post(

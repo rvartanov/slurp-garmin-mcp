@@ -149,6 +149,15 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   1.0.7 → 1.0.9 and certifi 2025.1.31 → 2026.11.20, for known
   vulnerabilities in the older versions. The security workflow now runs
   `pip-audit` against `uv.lock` and fails on a known vulnerability.
+- File tools stay inside the download directory. With
+  `GARMIN_FIT_DOWNLOAD_DIR` set, `download_activity_file`'s `output_dir`,
+  `download_course_gpx`'s `output_path`, `save=true` downloads,
+  `set_fit_download_dir` and `upload_course`'s `gpx_path` must resolve
+  (symlinks included) inside it. Over HTTP without it, the limit is
+  `<state dir>/downloads`, which is now also the default download directory
+  there, and `set_fit_download_dir` is not offered. Files are written
+  without following a symlink. stdio without `GARMIN_FIT_DOWNLOAD_DIR` is
+  unchanged.
 
 ## [1.0.0] - 2026-11-18
 

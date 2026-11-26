@@ -68,7 +68,7 @@ public names instead of switching the check off:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `GARMIN_FIT_DOWNLOAD_DIR` | | Directory for files saved by `download_activity_file`. When set, the first-run question is skipped. |
+| `GARMIN_FIT_DOWNLOAD_DIR` | over HTTP: `<state dir>/downloads` | Directory for files saved by `download_activity_file` and the other download tools. When set, the first-run question is skipped, and tools may only write and read (`upload_course`) files inside it. Over HTTP the default directory is the limit instead; see [tool-notes.md](tool-notes.md#activity-file-downloads). |
 | `GARMIN_FIT_CONFIG` | `~/.garminconnect_fit_config.json` | Where the chosen download directory is remembered. |
 
 ## Tool Filtering
