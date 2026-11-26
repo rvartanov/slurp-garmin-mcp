@@ -114,8 +114,9 @@ This saves OAuth tokens to `~/.garminconnect` for future use. The server will au
 **Additional Options:**
 
 ```bash
-# Use environment variables for credentials
-GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=secret garmin-mcp-auth
+# Without options it asks for email, password and MFA code; the password is
+# not echoed and does not end up in your shell history
+garmin-mcp-auth
 
 # Verify existing tokens
 garmin-mcp-auth --verify
@@ -135,10 +136,11 @@ garmin-mcp-auth --token-path ~/.garmin_tokens
 You can provide credentials from files to the authentication CLI:
 
 ```bash
-# Store credentials in files for security
-echo "your_email@example.com" > ~/.garmin_email
-echo "your_password" > ~/.garmin_password
-chmod 600 ~/.garmin_email ~/.garmin_password
+# Store credentials in owner-only files; read -s keeps the password off the
+# screen and out of your shell history
+(umask 077
+ read -rp 'Garmin email: ' v && printf '%s\n' "$v" > ~/.garmin_email
+ read -rsp 'Garmin password: ' v && printf '%s\n' "$v" > ~/.garmin_password; echo)
 
 # Run the authentication CLI before starting the server
 GARMIN_EMAIL_FILE=~/.garmin_email GARMIN_PASSWORD_FILE=~/.garmin_password \

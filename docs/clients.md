@@ -72,7 +72,15 @@ You have two options to run the MCP locally with Claude.
 
 ### Directly from github without cloning the repo:
 
-1. Add this server configuration:
+1. Log in once in a terminal; this asks for your email, password and MFA code
+   and saves OAuth tokens to `~/.garminconnect`, so no credentials go into the
+   client config:
+
+```bash
+uvx --python 3.12 --from git+https://github.com/rvartanov/slurp-garmin-mcp garmin-mcp-auth
+```
+
+2. Add this server configuration:
 
 ```json
 {
@@ -85,11 +93,7 @@ You have two options to run the MCP locally with Claude.
         "--from",
         "git+https://github.com/rvartanov/slurp-garmin-mcp",
         "garmin-mcp"
-      ],
-      "env": {
-        "GARMIN_EMAIL": "YOUR_GARMIN_EMAIL",
-        "GARMIN_PASSWORD": "YOUR_GARMIN_PASSWORD"
-      }
+      ]
     }
   }
 }
@@ -97,7 +101,12 @@ You have two options to run the MCP locally with Claude.
 
 You might have to add the full path to `uvx` you can check the full path with `which uvx`
 
-2. Restart Claude Desktop
+Do not put `GARMIN_PASSWORD` in this file: client configs are plain text that
+other programs and backups can read. If you need a password fallback, use
+`GARMIN_PASSWORD_FILE` with an owner-only file (see
+[troubleshooting.md](troubleshooting.md#alternative-manual-first-run)).
+
+3. Restart Claude Desktop
 
 ### Directly from your local copy of the repository:
 
@@ -219,7 +228,9 @@ The easiest way to add this server to Claude Desktop is via the `.dxt` Desktop E
 
 1. Build `garmin-mcp.dxt` (see below), or download it from the [Releases page](https://github.com/rvartanov/slurp-garmin-mcp/releases) when a release provides one.
 2. Drag the `.dxt` file into the Claude Desktop window, **or** double-click it, **or** go to **Settings → Extensions → Install Extension** and select the file.
-3. Claude Desktop will prompt you for optional configuration (token path, email, password).
+3. Claude Desktop will prompt you for the optional token path. The extension
+   does not ask for your Garmin password; it logs in with the tokens from
+   `garmin-mcp-auth` below.
 
 ### First-time authentication
 

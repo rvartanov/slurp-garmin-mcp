@@ -175,6 +175,10 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
 - The Docker instructions no longer make the URL secret world-readable
   (`chmod 644`): it is owned by the container user (uid 10001) with mode
   0400.
+- The Desktop Extension no longer asks for the Garmin email and password;
+  it logs in with the tokens from `garmin-mcp-auth`, which its install
+  steps already require. The client and troubleshooting docs no longer put
+  the password in a client config or on a command line.
 
 ## [1.0.0] - 2026-11-18
 
