@@ -176,6 +176,8 @@ class TestAuthenticate:
             base64_path = f"{tmpdir}/base64.txt"
             with patch("builtins.open", m):
                 result = authenticate(tmpdir, base64_path, force_reauth=False)
+            written = Path(base64_path).read_text()
+            mode = os.stat(base64_path).st_mode & 0o777
 
         assert result is True
         mock_garmin_instance.client.login.assert_called_once_with(
@@ -184,10 +186,10 @@ class TestAuthenticate:
         mock_garmin_instance.client.dump.assert_called_once_with(tmpdir)
         # Tokens are verified by an independent token-based login
         mock_verify.assert_called_once()
-        # Verify base64-encoded token data was written to the base64 file
-        m().write.assert_called_once_with(expected_b64)
-        # Verify restrictive permissions were applied to the base64 file
-        mock_chmod.assert_any_call(os.path.expanduser(base64_path), 0o600)
+        # Verify base64-encoded token data was written to the base64 file,
+        # created owner-only
+        assert written == expected_b64
+        assert mode == 0o600
 
     @patch("garmin_mcp.auth_cli.token_exists", return_value=False)
     @patch(
@@ -229,7 +231,7 @@ class TestAuthenticate:
             expected_token_path
         )
         mock_verify.assert_called_once_with(expected_token_path, False)
-        mock_chmod.assert_any_call(expected_base64_path, 0o600)
+        assert os.stat(expected_base64_path).st_mode & 0o777 == 0o600
 
     @patch("garmin_mcp.auth_cli.token_exists")
     @patch("garmin_mcp.auth_cli.get_credentials")

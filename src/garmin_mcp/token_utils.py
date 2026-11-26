@@ -1,5 +1,6 @@
 """Token management utilities for Garmin MCP authentication."""
 
+import base64
 import json
 import os
 from pathlib import Path
@@ -64,6 +65,37 @@ def get_token_base64_path() -> str:
     return resolve_token_path(
         os.getenv("GARMINTOKENS_BASE64") or "~/.garminconnect_base64"
     )
+
+
+def requested_token_base64_path():
+    """Path of the optional base64 token export, or None when not requested.
+
+    The server and garmin-mcp-auth never read this file; it is a copy for
+    other garminconnect-based tools, written only when GARMINTOKENS_BASE64
+    names it explicitly.
+    """
+    value = os.getenv("GARMINTOKENS_BASE64")
+    return resolve_token_path(value) if value else None
+
+
+def write_token_base64(token_dir: str, path: str) -> None:
+    """Write the token file in token_dir, base64-encoded, to path.
+
+    The file is created owner-only (0600) in one step and a symlink at path
+    is refused, so the bearer tokens are never readable by others, not even
+    briefly. Raises OSError on failure.
+    """
+    with open(os.path.join(token_dir, TOKEN_FILE_NAME), "r") as f:
+        token_data = f.read()
+    encoded = base64.b64encode(token_data.encode()).decode()
+    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags, 0o600)
+    try:
+        if hasattr(os, "fchmod"):
+            os.fchmod(fd, 0o600)  # an existing file keeps its old mode otherwise
+        os.write(fd, encoded.encode())
+    finally:
+        os.close(fd)
 
 
 def token_exists(token_path: str = None) -> bool:

@@ -14,7 +14,7 @@ need.
 | Variable | Default | Meaning |
 |---|---|---|
 | `GARMINTOKENS` | `~/.garminconnect` | Directory with the tokens saved by `garmin-mcp-auth`. `~` and `${HOME}` are expanded. |
-| `GARMINTOKENS_BASE64` | | The tokens as one base64 string, for platforms without a persistent disk. |
+| `GARMINTOKENS_BASE64` | | File for an optional base64 copy of the tokens, for other garminconnect-based tools. Written (mode 0600) by `garmin-mcp-auth` and after a password login only when set; the server never reads it. |
 | `GARMIN_EMAIL`, `GARMIN_EMAIL_FILE` | | Login email. Only needed for `garmin-mcp-auth`, or as a fallback for accounts without MFA. |
 | `GARMIN_PASSWORD`, `GARMIN_PASSWORD_FILE` | | Password, same use as the email. |
 | `GARMIN_IS_CN` | `false` | `true` for Garmin Connect China (garmin.cn). |

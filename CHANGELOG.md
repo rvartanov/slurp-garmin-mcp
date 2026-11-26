@@ -163,6 +163,11 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
 - Dates and ids that the nutrition tools and `get_workout_by_id` put into
   a Garmin API path are checked first (`YYYY-MM-DD`; letters, digits and
   dashes), so a crafted argument cannot reach another endpoint.
+- The base64 copy of the Garmin tokens (`~/.garminconnect_base64`) is no
+  longer written by default: only when `GARMINTOKENS_BASE64` names a file.
+  Nothing in the server reads it. It is created owner-only in one step
+  (it was created with the default umask and chmod-ed afterwards) and a
+  symlink in its place is refused.
 
 ## [1.0.0] - 2026-11-18
 

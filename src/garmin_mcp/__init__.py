@@ -8,7 +8,6 @@ import functools
 import inspect
 import os
 import sys
-import base64
 import contextlib
 import threading
 
@@ -597,7 +596,8 @@ def init_api(email, password, tokenstore=None, tokenstore_base64=None, is_cn=Non
     if tokenstore is None:
         tokenstore = token_utils.get_token_path()
     if tokenstore_base64 is None:
-        tokenstore_base64 = token_utils.get_token_base64_path()
+        # Only written when GARMINTOKENS_BASE64 asks for it; nothing reads it.
+        tokenstore_base64 = token_utils.requested_token_base64_path()
     if is_cn is None:
         is_cn = _resolve_is_cn()
 
@@ -688,26 +688,20 @@ def init_api(email, password, tokenstore=None, tokenstore_base64=None, is_cn=Non
             )
             # The directory above is the login source; base64 is only an
             # optional export and must not prevent loading the saved tokens.
-            try:
-                token_json_path = os.path.join(tokenstore, "garmin_tokens.json")
-                with open(token_json_path, "r") as f:
-                    token_data = f.read()
-                token_base64 = base64.b64encode(token_data.encode()).decode()
-                with open(tokenstore_base64, "w") as token_file:
-                    # Secure the optional file before writing bearer tokens.
-                    os.chmod(tokenstore_base64, 0o600)
-                    token_file.write(token_base64)
-            except OSError as err:
-                print(
-                    f"WARNING: OAuth tokens were saved to '{tokenstore}', but the optional "
-                    f"base64 export to '{tokenstore_base64}' failed: {err}",
-                    file=sys.stderr,
-                )
-            else:
-                print(
-                    f"Oauth tokens encoded as base64 string and saved to '{tokenstore_base64}' file for future use. (second method)\n",
-                    file=sys.stderr,
-                )
+            if tokenstore_base64:
+                try:
+                    token_utils.write_token_base64(tokenstore, tokenstore_base64)
+                except OSError as err:
+                    print(
+                        f"WARNING: OAuth tokens were saved to '{tokenstore}', but the optional "
+                        f"base64 export to '{tokenstore_base64}' failed: {err}",
+                        file=sys.stderr,
+                    )
+                else:
+                    print(
+                        f"Oauth tokens encoded as base64 string and saved to '{tokenstore_base64}' file for future use. (second method)\n",
+                        file=sys.stderr,
+                    )
             # The early-return login above does not load the profile or unit
             # settings (display_name stays None, so tools that build URLs from
             # it fail). Log in again from the saved tokens to load them, which
