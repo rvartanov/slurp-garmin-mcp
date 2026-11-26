@@ -134,6 +134,21 @@ For a local stdio client, override the transport:
 The `garmin-tokens` volume holds the Garmin login. Removing it
 (`docker volume rm`) means logging in again.
 
+### Published image
+
+Every release is published to the GitHub Container Registry, so building is
+optional:
+
+```bash
+docker pull ghcr.io/rvartanov/slurp-garmin-mcp:latest
+```
+
+`latest` is the newest release; a version tag such as
+`ghcr.io/rvartanov/slurp-garmin-mcp:1.0.0` pins one (the versions are in
+[CHANGELOG.md](../CHANGELOG.md)). Use that name instead of `slurp-garmin-mcp`
+in the `docker run` commands above. To upgrade, pull the new tag and recreate
+the container; the `garmin-tokens` volume is kept.
+
 ## Publish it with TLS
 
 The service listens on `127.0.0.1:8000`. Put one of these in front. Examples
