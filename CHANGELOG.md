@@ -160,6 +160,9 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   unchanged.
 - Unpacking a downloaded FIT file (ZIP or gzip) stops at 25 MB, the upload
   limit, so a crafted archive cannot exhaust the server's memory.
+- Dates and ids that the nutrition tools and `get_workout_by_id` put into
+  a Garmin API path are checked first (`YYYY-MM-DD`; letters, digits and
+  dashes), so a crafted argument cannot reach another endpoint.
 
 ## [1.0.0] - 2026-11-18
 

@@ -10,6 +10,7 @@ from typing import Optional
 import requests
 from garminconnect import GarminConnectConnectionError
 
+from garmin_mcp.workouts import _validate_date, _validate_id
 from garmin_mcp.write_errors import WriteTracker
 
 # The garmin_client will be set by the main file
@@ -299,6 +300,7 @@ def register_tools(app):
             date: Date in YYYY-MM-DD format
         """
         try:
+            _validate_date(date, "date")
             url = f"/nutrition-service/food/logs/{date}"
             data = garmin_client.connectapi(url)
             if not data:
@@ -389,6 +391,7 @@ def register_tools(app):
             date: Date in YYYY-MM-DD format
         """
         try:
+            _validate_date(date, "date")
             url = f"/nutrition-service/meals/{date}"
             data = garmin_client.connectapi(url)
             if not data:
@@ -408,6 +411,7 @@ def register_tools(app):
             date: Date in YYYY-MM-DD format
         """
         try:
+            _validate_date(date, "date")
             url = f"/nutrition-service/settings/{date}"
             data = garmin_client.connectapi(url)
             if not data:
@@ -452,6 +456,7 @@ def register_tools(app):
             return "No fields to update — supply at least one of calorie_goal, carbs_grams, fat_grams, protein_grams."
         tracker = WriteTracker("set_nutrition_daily_settings", "Error updating nutrition settings")
         try:
+            _validate_date(date, "date")
             url = f"/nutrition-service/settings/{date}"
             current = garmin_client.connectapi(url)
             if not current:
@@ -935,6 +940,7 @@ def register_tools(app):
         """
         tracker = WriteTracker("delete_custom_food", "Error deleting custom food")
         try:
+            _validate_id(food_id, "food_id")
             if not confirm:
                 food = _find_custom_food(food_id, "")
                 if food is None:
@@ -1146,6 +1152,8 @@ def register_tools(app):
         """
         tracker = WriteTracker("delete_food_log", "Error deleting food log")
         try:
+            _validate_date(meal_date, "meal_date")
+            _validate_id(log_id, "log_id")
             url = f"/nutrition-service/food/logs/{meal_date}"
             if not confirm:
                 entry = _find_food_log_entry(garmin_client.connectapi(url), log_id)

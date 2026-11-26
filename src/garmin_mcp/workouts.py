@@ -22,6 +22,18 @@ def _validate_date(value: str, field: str = "date") -> str:
             pass
     raise ValueError(f"Invalid {field} {value!r}: expected YYYY-MM-DD")
 
+
+_ID_RE = re.compile(r'[A-Za-z0-9-]{1,64}')
+
+
+def _validate_id(value: Any, field: str = "id") -> str:
+    """Return value as a string if it is a plain Garmin id (letters, digits,
+    dashes), so it is safe to put into an API path; raise ValueError otherwise."""
+    text = str(value) if isinstance(value, (str, int)) and not isinstance(value, bool) else ""
+    if _ID_RE.fullmatch(text):
+        return text
+    raise ValueError(f"Invalid {field} {value!r}: expected letters, digits and dashes only")
+
 # The garmin_client will be set by the main file
 garmin_client = None
 
@@ -903,6 +915,7 @@ def register_tools(app):
 
             if is_uuid:
                 # Training plan / Garmin Coach workout - use fbt-adaptive endpoint
+                _validate_id(workout_id_str, "workout_id")
                 url = f"workout-service/fbt-adaptive/{workout_id_str}"
                 workout = garmin_client.connectapi(url)
             else:
