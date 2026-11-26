@@ -78,9 +78,12 @@ git merge upstream/main
 ```
 
 The `Upstream watch` workflow checks upstream every Monday. A clean merge
-whose tests pass is merged through a pull request (`scripts/merge_upstream.sh`);
-otherwise one issue (label `upstream-sync`) lists the unmerged commits and the
-files both sides changed. Run it by hand from the Actions tab, or locally with
+whose tests pass is offered as a pull request labelled `upstream-sync`
+(`scripts/merge_upstream.sh`) that waits for review: nothing is merged
+automatically. The upstream code runs in a job with a read-only token; a
+second job, which runs none of it, pushes the branch and opens the pull
+request. Otherwise one issue (label `upstream-sync`) lists the unmerged
+commits and the files both sides changed. Run it by hand from the Actions tab, or locally with
 `git fetch upstream && DRY_RUN=1 scripts/check_upstream.sh`.
 
 Fixes that are not specific to this fork are best contributed upstream as

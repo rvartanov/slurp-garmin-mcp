@@ -201,5 +201,8 @@ installs from its own clean clone (`SRC`), never from a working copy.
 
 The `Upstream watch` workflow checks Taxuspt/garmin_mcp every Monday. When
 the merge is clean and the unit and integration tests pass, it opens a
-pull request labelled `upstream-sync` and merges it; otherwise it keeps an
-issue with the unmerged commits and the files that conflict.
+pull request labelled `upstream-sync` and leaves it for review; it never
+merges. Upstream code runs only in a job with a read-only token. Otherwise it
+keeps an issue with the unmerged commits and the files that conflict.
+Because automatic updates deploy every green commit on `main`, review an
+upstream pull request before merging it.

@@ -139,6 +139,13 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   the SDK only accepts a loopback `Host` on a loopback bind. The deployment
   examples now set `GARMIN_MCP_ALLOWED_HOSTS`.
 
+### Security
+
+- The upstream watch no longer merges anything: a clean, green upstream
+  merge is opened as a pull request that waits for review. Upstream code
+  runs in a job with a read-only token; a separate job pushes the branch and
+  opens the pull request. Its actions are pinned by commit SHA.
+
 ## [1.0.0] - 2026-11-18
 
 First release as Slurp garmin-mcp, forked from

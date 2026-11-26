@@ -1,34 +1,42 @@
 name: Upstream watch
 
 # Weekly check for new commits in Taxuspt/garmin_mcp. A clean merge whose
-# tests pass is merged through a pull request (scripts/merge_upstream.sh);
-# anything else is reported in one issue labelled upstream-sync
-# (scripts/check_upstream.sh), which closes itself once upstream is merged.
+# tests pass is offered as a pull request (scripts/merge_upstream.sh) that
+# waits for the owner's review; nothing is merged automatically. Anything else
+# is reported in one issue labelled upstream-sync (scripts/check_upstream.sh),
+# which closes itself once upstream is merged.
+#
+# Upstream code (uv sync, pytest) runs only in the "test" job, which has a
+# read-only token and no credentials in the checkout. The "publish" job pushes
+# the prepared branch and opens the pull request without running project code
+# from the merge.
 on:
   schedule:
     - cron: '17 6 * * 1'   # Mondays 06:17 UTC
   workflow_dispatch:
 
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: upstream-watch
   cancel-in-progress: false
 
 jobs:
-  sync:
+  test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      result: ${{ steps.merge.outputs.result }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       with:
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
 
     - name: Set up Python
       run: uv python install 3.12
@@ -38,16 +46,60 @@ jobs:
         git remote add upstream https://github.com/Taxuspt/garmin_mcp.git
         git fetch --no-tags upstream main
 
-    - name: Merge upstream when clean and green
+    - name: Merge upstream and run the tests
       id: merge
       env:
-        GH_TOKEN: ${{ github.token }}
         UV_PYTHON: '3.12'
-      run: bash scripts/merge_upstream.sh
+        BUNDLE: ${{ runner.temp }}/upstream-sync.bundle
+      # Run a copy: the merge may change the files in the working tree.
+      run: |
+        cp scripts/merge_upstream.sh "$RUNNER_TEMP/merge_upstream.sh"
+        bash "$RUNNER_TEMP/merge_upstream.sh" prepare
+
+    - name: Keep the prepared branch
+      if: steps.merge.outputs.result == 'ready'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: upstream-sync
+        path: ${{ runner.temp }}/upstream-sync.bundle
+        if-no-files-found: error
+        retention-days: 7
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      with:
+        fetch-depth: 0
+
+    - name: Fetch upstream
+      run: |
+        git remote add upstream https://github.com/Taxuspt/garmin_mcp.git
+        git fetch --no-tags upstream main
+
+    - name: Get the prepared branch
+      if: needs.test.outputs.result == 'ready'
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: upstream-sync
+        path: ${{ runner.temp }}/sync
+
+    - name: Open a pull request for review
+      if: needs.test.outputs.result == 'ready'
+      env:
+        GH_TOKEN: ${{ github.token }}
+        BUNDLE: ${{ runner.temp }}/sync/upstream-sync.bundle
+      run: bash scripts/merge_upstream.sh publish
 
     - name: Report what is left
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        git fetch -q origin main && git checkout -q origin/main
+        git checkout -q origin/main
         bash scripts/check_upstream.sh
