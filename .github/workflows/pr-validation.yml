@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -64,8 +67,12 @@ jobs:
 
     steps:
     - name: PR Info
+      # Untrusted text (title, branch name) goes through env, never into the
+      # script itself.
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        HEAD_REF: ${{ github.head_ref }}
+        BASE_REF: ${{ github.base_ref }}
       run: |
-        echo "PR #${{ github.event.pull_request.number }}"
-        echo "Title: ${{ github.event.pull_request.title }}"
-        echo "Branch: ${{ github.head_ref }}"
-        echo "Base: ${{ github.base_ref }}"
+        printf 'PR #%s\nTitle: %s\nBranch: %s\nBase: %s\n' "$PR_NUMBER" "$PR_TITLE" "$HEAD_REF" "$BASE_REF"
