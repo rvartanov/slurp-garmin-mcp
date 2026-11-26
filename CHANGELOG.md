@@ -145,6 +145,10 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   merge is opened as a pull request that waits for review. Upstream code
   runs in a job with a read-only token; a separate job pushes the branch and
   opens the pull request. Its actions are pinned by commit SHA.
+- Locked dependencies: mcp 1.28.1 → 1.30.0, h11 0.14.0 → 0.16.0, httpcore
+  1.0.7 → 1.0.9 and certifi 2025.1.31 → 2026.11.20, for known
+  vulnerabilities in the older versions. The security workflow now runs
+  `pip-audit` against `uv.lock` and fails on a known vulnerability.
 
 ## [1.0.0] - 2026-11-18
 
