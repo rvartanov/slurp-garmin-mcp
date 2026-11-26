@@ -179,6 +179,8 @@ Taken from open upstream pull requests (authorship kept, `cherry picked from` in
   it logs in with the tokens from `garmin-mcp-auth`, which its install
   steps already require. The client and troubleshooting docs no longer put
   the password in a client config or on a command line.
+- The nginx example sends that server's error log to `/dev/null`: nginx
+  quotes the request line, and with it the URL secret, in upstream errors.
 
 ## [1.0.0] - 2026-11-18
 
